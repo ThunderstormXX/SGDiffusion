@@ -116,3 +116,13 @@ class CNNLayerNorm(nn.Module):
         x = self.fc2(x)
         x = self.ln3(x)
         return x
+    
+# Определение модели
+class SimpleModel(nn.Module):
+    def __init__(self):
+        super(SimpleModel, self).__init__()
+        self.linear = nn.Linear(2, 1, bias=True)
+        
+    def forward(self, x):
+        x = self.linear(x)
+        return torch.sigmoid(x)
