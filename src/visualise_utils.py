@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import TensorDataset, DataLoader
-
+import math
 
 
 def init_data(n_samples=1000, loc1 = [-3, -1], loc2 = [1, 3] ,sigma1=4, sigma2 = 3, seed=42, batch_size=1, shuffle=True, device='cpu', full_loader=False):
@@ -246,3 +246,95 @@ def visualize_gradient_histograms_at_steps(base_folder, num_steps, batch_size=1)
             plt.grid(True)
             plt.tight_layout()
             plt.show()
+
+def alpha_estimator(m, X):
+    """
+    Оценка параметра α согласно Corollary 2.4 из Mohammadi (2014).
+    """
+    N = len(X)
+    n = N // m  # Количество групп
+    Y = torch.sum(X.view(n, m, -1), dim=1)  # Группировка и суммирование
+
+    eps = np.finfo(float).eps  # Маленькое число для защиты от логарифма 0
+    Y_log_norm = torch.log(Y.norm(dim=1) + eps).mean()
+    X_log_norm = torch.log(X.norm(dim=1) + eps).mean()
+    
+    diff = (Y_log_norm - X_log_norm) / math.log(m)
+    
+    return float(np.clip(1 / diff, a_min = 0 , a_max = 2))
+
+def alpha_estimator2(m, k, X):
+    """
+    Оценка параметра α согласно Corollary 2.2 из Mohammadi (2014).
+    """
+    N = len(X)
+    n = int(N / m)  # Размер группы
+    Y = torch.sum(X.view(n, m, -1), 1)
+    eps = np.spacing(1)
+    
+    Y_log_norm = torch.log(Y.norm(dim=1) + eps)
+    X_log_norm = torch.log(X.norm(dim=1) + eps)
+
+    # Выбираем k-й элемент после сортировки
+    Yk = torch.sort(Y_log_norm)[0][k - 1]
+    Xk = torch.sort(X_log_norm)[0][m * k - 1]
+    
+    diff = (Yk - Xk) / math.log(m)
+    
+    return float(np.clip(1 / diff, a_min = 0 , a_max = 2))
+
+def visualize_alpha_over_steps(base_folder, num_steps, batch_size=1, estimate_alpha_fn=None):
+    assert estimate_alpha_fn is not None, "Нужно передать функцию оценки альфы!"
+
+    alpha_values = {}  # name -> [alpha_t0, alpha_t1, ..., alpha_tN]
+    grad_values = {}
+
+    for step in range(num_steps):
+        folder = os.path.join(base_folder, f"trajectory_step_{step}")
+        model_path = os.path.join(folder, "model.pt")
+        grad_files = sorted([f for f in os.listdir(folder) if f.startswith("gradients_") and f.endswith(".pt")])
+
+        if not os.path.exists(model_path) or not grad_files:
+            continue
+
+        # Собираем градиенты
+        grad_accum = {}
+        for gf in grad_files:
+            grads = torch.load(os.path.join(folder, gf))
+            for name, g in grads.items():
+                g_flat = g.cpu().flatten()
+                grad_accum.setdefault(name, []).append(g_flat)
+
+        # Учет батчей и оценка альф
+        for name, grads_list in grad_accum.items():
+            grads_tensor = torch.stack(grads_list)  # (num_batches, num_params)
+
+            # Группируем по батчам
+            grad_means = []
+            for i in range(0, grads_tensor.shape[0], batch_size):
+                batch = grads_tensor[i:i+batch_size]
+                batch_mean = batch.mean(dim=0)
+                grad_means.append(batch_mean)
+
+            grad_means_tensor = torch.stack(grad_means)  # (num_effective_batches, num_params)
+
+            # Оценка альфы по каждому параметру отдельно
+            for i in range(grad_means_tensor.shape[1]):
+                grad_series = grad_means_tensor[:, i].numpy()
+                alpha = estimate_alpha_fn(grad_series)
+                alpha_values.setdefault((name, i), []).append(alpha)
+                grad_values.setdefault((name, i), []).append(grad_series)
+
+    # Визуализация
+    for (name, idx), alpha_series in alpha_values.items():
+        plt.figure(figsize=(8, 4))
+        plt.plot(alpha_series, marker='o')
+        plt.ylim(0.5, 2.0)
+        plt.title(f"Estimated alpha for {name}[{idx}]")
+        plt.xlabel("Training Step")
+        plt.ylabel("Estimated α")
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+        
+    return alpha_values, grad_values
