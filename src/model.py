@@ -1,6 +1,42 @@
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class FlexibleMLP(nn.Module):
+    def __init__(self, input_dim=28*28, output_dim=10, hidden_dim=512, 
+                 num_hidden_layers=2, dropout_list=None, use_relu_list=None):
+        super(FlexibleMLP, self).__init__()
+
+        if dropout_list is None:
+            dropout_list = [0.0] * num_hidden_layers
+        if use_relu_list is None:
+            use_relu_list = [True] * num_hidden_layers
+
+        assert len(dropout_list) == num_hidden_layers, "dropout_list must match num_hidden_layers"
+        assert len(use_relu_list) == num_hidden_layers, "use_relu_list must match num_hidden_layers"
+
+        layers = []
+        in_dim = input_dim
+
+        for i in range(num_hidden_layers):
+            layers.append(nn.Linear(in_dim, hidden_dim))
+            if use_relu_list[i]:
+                layers.append(nn.ReLU())
+            if dropout_list[i] > 0:
+                layers.append(nn.Dropout(dropout_list[i]))
+            in_dim = hidden_dim
+
+        layers.append(nn.Linear(in_dim, output_dim))  # выходной слой без активации
+
+        self.model = nn.Sequential(*layers)
+
+    def forward(self, x):
+        x = x.view(x.size(0), -1)  # flatten input
+        return self.model(x)
+
 
 class CNN(nn.Module):
     def __init__(self, k=1):
