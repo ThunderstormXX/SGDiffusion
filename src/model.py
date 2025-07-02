@@ -5,10 +5,31 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
 class FlexibleMLP(nn.Module):
-    def __init__(self, input_dim=28*28, output_dim=10, hidden_dim=512, 
-                 num_hidden_layers=2, dropout_list=None, use_relu_list=None):
+    def __init__(
+        self,
+        input_dim=28 * 28,
+        output_dim=10,
+        hidden_dim=512,
+        num_hidden_layers=2,
+        dropout_list=None,
+        use_relu_list=None,
+        input_downsample=None  # <-- новое: сторона квадрата после понижения, напр. 7 → 7x7=49
+    ):
         super(FlexibleMLP, self).__init__()
+
+        self.input_downsample = input_downsample
+
+        if self.input_downsample is not None:
+            self.downsampler = nn.AdaptiveAvgPool2d((input_downsample, input_downsample))
+            input_dim = input_downsample * input_downsample
+        else:
+            self.downsampler = None
+            input_dim = input_dim  # = 784 по умолчанию
 
         if dropout_list is None:
             dropout_list = [0.0] * num_hidden_layers
@@ -30,11 +51,12 @@ class FlexibleMLP(nn.Module):
             in_dim = hidden_dim
 
         layers.append(nn.Linear(in_dim, output_dim))  # выходной слой без активации
-
         self.model = nn.Sequential(*layers)
 
     def forward(self, x):
-        x = x.view(x.size(0), -1)  # flatten input
+        if self.downsampler is not None:
+            x = self.downsampler(x)  # [B, 1, 28, 28] → [B, 1, d, d]
+        x = x.view(x.size(0), -1)    # flatten
         return self.model(x)
 
 
