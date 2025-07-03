@@ -20,7 +20,7 @@ random.seed(228)
 # ======== Настройки ========
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 BATCH_SIZES = [1, 4, 8, 16, 32, 64]
-NUM_ITERATIONS = 100
+NUM_ITERATIONS = 1000
 SAVE_DIR = "data/checkpoints/exp15"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
