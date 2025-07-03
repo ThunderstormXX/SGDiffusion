@@ -21,12 +21,13 @@ random.seed(228)
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 BATCH_SIZE = 64
 LR = 0.1
-NUM_EPOCHS = 50
+NUM_EPOCHS = 60000
+SAMPLE_SIZE = 386
 SAVE_DIR = "data/checkpoints/exp15"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 # ======== Загрузка данных ========
-train_dataset, test_dataset, train_loader, test_loader = MNIST(batch_size=BATCH_SIZE)
+train_dataset, test_dataset, train_loader, test_loader = MNIST(batch_size=BATCH_SIZE, sample_size = SAMPLE_SIZE)
 
 # ======== Конфигурация модели ========
 HIDDEN_DIM = 8

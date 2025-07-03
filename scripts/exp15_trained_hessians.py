@@ -19,14 +19,15 @@ random.seed(228)
 
 # ======== Настройки ========
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-BATCH_SIZES = [1, 4, 8, 16, 32, 64]
+BATCH_SIZES = [2,4, 8, 16, 32, 64]
 NUM_ITERATIONS = 1000
+SAMPLE_SIZE = 386
 SAVE_DIR = "data/checkpoints/exp15"
 TRAINED_MODEL_PATH = os.path.join(SAVE_DIR, "trained_model.pth")
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 # ======== Загрузка данных ========
-train_dataset, test_dataset, _, _ = MNIST(batch_size=64)
+train_dataset, test_dataset, _, _ = MNIST(batch_size=64, sample_size=SAMPLE_SIZE )
 
 # ======== Модель (точно такая же, как при обучении) ========
 model = FlexibleMLP(
