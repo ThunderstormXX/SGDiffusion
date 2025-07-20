@@ -19,8 +19,8 @@ random.seed(228)
 
 # ======== Настройки ========
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-BATCH_SIZE = 64
-LR = 0.1
+BATCH_SIZE = 16
+LR = 0.001
 NUM_EPOCHS = 60000
 SAMPLE_SIZE = 386
 SAVE_DIR = "data/checkpoints/exp15"
