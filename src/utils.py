@@ -90,7 +90,7 @@ def MNIST(batch_size = 64, sample_size = None):
         indices = torch.randperm(len(train_dataset)).tolist()[:sample_size]
         train_dataset = Subset(train_dataset, indices)
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last = True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     return train_dataset, test_dataset, train_loader, test_loader
 
@@ -107,7 +107,7 @@ def CIFAR(batch_size=64, sample_size=None):
         indices = torch.randperm(len(train_dataset)).tolist()[:sample_size]
         train_dataset = Subset(train_dataset, indices)
     
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last = True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     
     return train_dataset, test_dataset, train_loader, test_loader
