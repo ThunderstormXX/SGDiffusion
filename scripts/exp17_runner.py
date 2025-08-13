@@ -31,6 +31,7 @@ def main():
     # Конфигурация экспериментов
     learning_rates = [0.1, 0.01]  # 1e-1, 1e-2
     batch_size = 64
+    device = sys.argv[1] if len(sys.argv) > 1 else 'auto'  # Получаем device из аргументов
     
     base_dir = os.path.dirname(os.path.abspath(__file__))
     train_script = os.path.join(base_dir, "exp17_train_to_plateau.py")
@@ -39,6 +40,7 @@ def main():
     print("🔬 ЗАПУСК ЭКСПЕРИМЕНТА 17: Обучение с отслеживанием гессианов")
     print(f"📊 Learning rates: {learning_rates}")
     print(f"📦 Batch size: {batch_size}")
+    print(f"🖥️  Device: {device}")
     
     success_count = 0
     total_experiments = len(learning_rates) * 2  # 2 этапа на каждый lr
@@ -51,8 +53,9 @@ def main():
             sys.executable, train_script,
             "--lr", str(lr),
             "--batch-size", str(batch_size),
-            "--max-epochs", "60000",
-            "--save-dir", f"data/checkpoints/exp17"
+            "--max-epochs", "10",
+            "--save-dir", f"data/checkpoints/exp17",
+            "--device", device
         ]
         
         if run_command(train_cmd, f"Обучение до плато: {experiment_name}"):
@@ -63,8 +66,9 @@ def main():
                 sys.executable, continue_script,
                 "--lr", str(lr),
                 "--batch-size", str(batch_size),
-                "--post-plateau-steps", "500",
-                "--save-dir", f"data/checkpoints/exp17"
+                "--post-plateau-steps", "10",
+                "--save-dir", f"data/checkpoints/exp17",
+                "--device", device
             ]
             
             if run_command(continue_cmd, f"Отслеживание гессианов: {experiment_name}"):

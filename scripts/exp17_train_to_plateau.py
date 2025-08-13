@@ -20,6 +20,7 @@ def parse_args():
     parser.add_argument('--max-epochs', type=int, default=60000, help='Maximum epochs')
     parser.add_argument('--save-dir', type=str, default='data/checkpoints/exp17', help='Save directory')
     parser.add_argument('--seed', type=int, default=228, help='Random seed')
+    parser.add_argument('--device', type=str, default='auto', help='Device to use (cuda, cpu, or auto)')
     return parser.parse_args()
 
 def evaluate_model(model, test_loader, criterion, device):
@@ -53,7 +54,12 @@ def main():
     random.seed(args.seed)
     
     # ======== Настройки ========
-    DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+    if args.device == 'auto':
+        DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+    elif args.device.isdigit():
+        DEVICE = f'cuda:{args.device}'
+    else:
+        DEVICE = args.device
     SAMPLE_SIZE = 1000  # Увеличенный размер выборки
     
     os.makedirs(args.save_dir, exist_ok=True)

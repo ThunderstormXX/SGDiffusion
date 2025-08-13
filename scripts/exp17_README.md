@@ -24,6 +24,7 @@
 - **Batch size**: 64
 - **Максимальные эпохи**: 60,000
 - **Шаги после плато**: 500
+- **Device**: Настраивается через аргументы командной строки
 
 ### 5. Детальное отслеживание прогресса
 - Информативные progress bars с метриками в реальном времени
@@ -52,27 +53,40 @@
 
 ### Автоматический запуск всех экспериментов
 ```bash
-# Через bash скрипт
+# Автоматический выбор устройства (GPU если доступно, иначе CPU)
 ./run_exp17.sh
 
+# Принудительное использование GPU
+./run_exp17.sh cuda
+
+# Принудительное использование CPU
+./run_exp17.sh cpu
+
+# Конкретный GPU
+./run_exp17.sh --device=3
+./run_exp17.sh 2
+
 # Или напрямую через Python
-python exp17_runner.py
+python exp17_runner.py [device]
 ```
 
 ### Ручной запуск отдельных экспериментов
 ```bash
-# Обучение SGD с lr=0.01
-python exp17_train_to_plateau.py --lr 0.01 --optimizer sgd --batch-size 64
+# Обучение с lr=0.01 на GPU
+python exp17_train_to_plateau.py --lr 0.01 --batch-size 64 --device cuda
 
-# Отслеживание гессианов для SGD с lr=0.01
-python exp17_continue_and_log.py --lr 0.01 --optimizer sgd --batch-size 64
+# Отслеживание гессианов для lr=0.01 на CPU
+python exp17_continue_and_log.py --lr 0.01 --batch-size 64 --device cpu
 
-# Обучение GD с lr=0.1
-python exp17_train_to_plateau.py --lr 0.1 --optimizer gd --batch-size 64
-
-# Отслеживание гессианов для GD с lr=0.1
-python exp17_continue_and_log.py --lr 0.1 --optimizer gd --batch-size 64
+# Конкретный GPU
+python exp17_train_to_plateau.py --lr 0.1 --batch-size 64 --device 3
 ```
+
+### Параметры устройства:
+- `auto` (по умолчанию) - автоматический выбор (CUDA если доступно)
+- `cuda` - принудительное использование GPU
+- `cpu` - принудительное использование CPU
+- `0`, `1`, `2`, `3`... - конкретный GPU по индексу
 
 ## Отслеживаемые метрики
 
