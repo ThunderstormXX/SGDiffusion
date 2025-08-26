@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """
-Эксперимент 17: Обучение с отслеживанием гессианов
-Основан на эксперименте 16 с улучшениями:
-- Увеличенный размер выборки (1000 вместо 386)
-- Отслеживание валидационных метрик
-- Learning rates: 1e-1, 1e-2
-- Batch size: 64
+Эксперимент 17: SGD vs GD с отслеживанием гессианов
+1) Обучить 4 модели: SGD+GD × lr(0.1, 0.01) до сходимости
+2) Для каждой точки продолжить обучение только SGD с логированием гессианов
+3) Графики с вертикальной линией перехода к SGD
 """
 
 import subprocess
@@ -17,7 +15,6 @@ def run_command(cmd, description):
     print(f"\n{'='*60}")
     print(f"🚀 {description}")
     print(f"{'='*60}")
-    print(f"Команда: {' '.join(cmd)}")
     
     try:
         result = subprocess.run(cmd, check=True)
@@ -30,68 +27,92 @@ def run_command(cmd, description):
 def main():
     # Конфигурация экспериментов
     learning_rates = [0.1, 0.01]  # 1e-1, 1e-2
+    optimizers = ['sgd', 'gd']
     batch_size = 64
-    device = sys.argv[1] if len(sys.argv) > 1 else 'auto'  # Получаем device из аргументов
     
     base_dir = os.path.dirname(os.path.abspath(__file__))
     train_script = os.path.join(base_dir, "exp17_train_to_plateau.py")
     continue_script = os.path.join(base_dir, "exp17_continue_and_log.py")
     
-    print("🔬 ЗАПУСК ЭКСПЕРИМЕНТА 17: Обучение с отслеживанием гессианов")
+    print("🔬 ЭКСПЕРИМЕНТ 17: SGD vs GD с отслеживанием гессианов")
     print(f"📊 Learning rates: {learning_rates}")
+    print(f"🔧 Optimizers: {optimizers}")
     print(f"📦 Batch size: {batch_size}")
-    print(f"🖥️  Device: {device}")
+    print("\n📋 План:")
+    print("1) Обучить 4 модели до сходимости (SGD+GD × 2 lr)")
+    print("2) Для каждой точки продолжить с SGD + логирование гессианов")
+    print("3) Создать объединенные графики с линией перехода")
     
     success_count = 0
-    total_experiments = len(learning_rates) * 2  # 2 этапа на каждый lr
+    total_tasks = len(learning_rates) * len(optimizers) * 2  # 4 обучения + 4 продолжения
+    
+    # Этап 1: Обучение до плато всех 4 моделей
+    print(f"\n{'='*60}")
+    print("📚 ЭТАП 1: Обучение до плато")
+    print(f"{'='*60}")
     
     for lr in learning_rates:
-        experiment_name = f"lr{lr}"
-        
-        # Этап 1: Обучение до плато
-        train_cmd = [
-            sys.executable, train_script,
-            "--lr", str(lr),
-            "--batch-size", str(batch_size),
-            "--max-epochs", "10",
-            "--save-dir", f"data/checkpoints/exp17",
-            "--device", device
-        ]
-        
-        if run_command(train_cmd, f"Обучение до плато: {experiment_name}"):
-            success_count += 1
+        for optimizer in optimizers:
+            experiment_name = f"{optimizer.upper()}_lr{lr}"
             
-            # Этап 2: Продолжение с отслеживанием гессианов
+            train_cmd = [
+                sys.executable, train_script,
+                "--lr", str(lr),
+                "--batch-size", str(batch_size),
+                "--optimizer", optimizer,
+                "--max-epochs", "1000",
+                "--save-dir", "data/checkpoints/exp17"
+            ]
+            
+            if run_command(train_cmd, f"Обучение до плато: {experiment_name}"):
+                success_count += 1
+                print(f"✅ {experiment_name}: Модель обучена")
+            else:
+                print(f"❌ {experiment_name}: Ошибка обучения")
+    
+    # Этап 2: Продолжение с SGD для каждой точки
+    print(f"\n{'='*60}")
+    print("🔍 ЭТАП 2: Продолжение с SGD + логирование гессианов")
+    print(f"{'='*60}")
+    
+    for lr in learning_rates:
+        for source_optimizer in optimizers:
+            experiment_name = f"{source_optimizer.upper()}_lr{lr} → SGD"
+            
             continue_cmd = [
                 sys.executable, continue_script,
                 "--lr", str(lr),
                 "--batch-size", str(batch_size),
-                "--post-plateau-steps", "10",
-                "--save-dir", f"data/checkpoints/exp17",
-                "--device", device
+                "--source-optimizer", source_optimizer,
+                "--post-plateau-steps", "500",
+                "--save-dir", "data/checkpoints/exp17"
             ]
             
             if run_command(continue_cmd, f"Отслеживание гессианов: {experiment_name}"):
                 success_count += 1
+                print(f"✅ {experiment_name}: Гессианы записаны")
             else:
-                print(f"⚠️  Не удалось выполнить отслеживание гессианов для {experiment_name}")
-        else:
-            print(f"⚠️  Не удалось обучить модель для {experiment_name}")
+                print(f"❌ {experiment_name}: Ошибка отслеживания")
     
     # Итоговый отчет
-    print(f"\n{'='*60}")
-    print(f"📊 ИТОГОВЫЙ ОТЧЕТ ЭКСПЕРИМЕНТА 17")
-    print(f"{'='*60}")
-    print(f"✅ Успешно выполнено: {success_count}/{total_experiments}")
-    print(f"❌ Неудачных попыток: {total_experiments - success_count}")
+    print(f"\n{'='*80}")
+    print("📊 ИТОГОВЫЙ ОТЧЕТ ЭКСПЕРИМЕНТА 17")
+    print(f"{'='*80}")
+    print(f"✅ Успешно выполнено: {success_count}/{total_tasks}")
+    print(f"❌ Неудачных попыток: {total_tasks - success_count}")
     
-    if success_count == total_experiments:
-        print("🎉 Все эксперименты выполнены успешно!")
+    if success_count == total_tasks:
+        print("\n🎉 Все эксперименты выполнены успешно!")
+        print("\n📈 Созданные файлы:")
+        print("   🏆 4 обученные модели (SGD+GD × 2 lr)")
+        print("   📊 4 набора гессианов (все → SGD)")
+        print("   📈 4 объединенных графика с линией перехода")
+        print("   💾 Метаданные и траектории параметров")
     else:
-        print("⚠️  Некоторые эксперименты завершились с ошибками")
+        print(f"\n⚠️ {total_tasks - success_count} задач завершились с ошибками")
     
     print(f"\n📁 Результаты сохранены в: data/checkpoints/exp17/")
-    print("📈 Для анализа результатов используйте соответствующие notebook'и")
+    print("🔬 Готово для анализа поведения оптимизаторов на плато!")
 
 if __name__ == "__main__":
     main()

@@ -7,6 +7,7 @@ import argparse
 import pickle
 from tqdm import tqdm
 import torch.nn as nn
+import matplotlib.pyplot as plt
 
 # ======== Локальные модули ========
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -20,7 +21,7 @@ def parse_args():
     parser.add_argument('--post-plateau-steps', type=int, default=500, help='Steps after plateau')
     parser.add_argument('--save-dir', type=str, default='data/checkpoints/exp17', help='Save directory')
     parser.add_argument('--seed', type=int, default=228, help='Random seed')
-    parser.add_argument('--device', type=str, default='auto', help='Device to use (cuda, cpu, or auto)')
+    parser.add_argument('--source-optimizer', type=str, choices=['sgd', 'gd'], required=True, help='Source optimizer that trained the model')
     return parser.parse_args()
 
 def compute_hessian(model, images, labels, criterion, device):
@@ -92,12 +93,7 @@ def main():
     random.seed(args.seed)
     
     # ======== Настройки ========
-    if args.device == 'auto':
-        DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-    elif args.device.isdigit():
-        DEVICE = f'cuda:{args.device}'
-    else:
-        DEVICE = args.device
+    DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     SAMPLE_SIZE = 1000  # Увеличенный размер выборки
     
     # ======== Загрузка данных ========
@@ -112,38 +108,43 @@ def main():
         input_downsample=6
     ).to(DEVICE)
     
-    # ======== Информация о модели и гиперпараметрах ========
-    num_params = sum(p.numel() for p in model.parameters())
-    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    
     print(f"\n📊 Конфигурация эксперимента 17:")
     print(f"   Device: {DEVICE}")
+    print(f"   Source optimizer: {args.source_optimizer.upper()}")
+    print(f"   Continue with: SGD")
     print(f"   Learning rate: {args.lr}")
     print(f"   Batch size: {args.batch_size}")
     print(f"   Sample size: {SAMPLE_SIZE}")
     print(f"   Post-plateau steps: {args.post_plateau_steps}")
-    print(f"   Random seed: {args.seed}")
-    print(f"\n🏗️  Архитектура модели:")
-    print(f"   Hidden dim: 8")
-    print(f"   Hidden layers: 1")
-    print(f"   Input downsample: 6")
-    print(f"   Total parameters: {num_params:,}")
-    print(f"   Trainable parameters: {trainable_params:,}")
     
-    plateau_model_path = os.path.join(args.save_dir, f"plateau_model_lr{args.lr}.pth")
+    # Загружаем модель, обученную указанным оптимизатором
+    plateau_model_path = os.path.join(args.save_dir, f"plateau_model_{args.source_optimizer}_lr{args.lr}.pth")
     if not os.path.exists(plateau_model_path):
-        raise FileNotFoundError(f"Модель в точке плато не найдена: {plateau_model_path}")
+        raise FileNotFoundError(f"Модель не найдена: {plateau_model_path}")
     
     model.load_state_dict(torch.load(plateau_model_path, map_location=DEVICE))
-    print(f"\n✅ Загружена модель из точки плато: {plateau_model_path}")
+    print(f"✅ Загружена модель: {plateau_model_path}")
     
-
+    # Загружаем метаданные исходного обучения
+    plateau_metadata_path = os.path.join(args.save_dir, f"plateau_metadata_{args.source_optimizer}_lr{args.lr}.npy")
+    if os.path.exists(plateau_metadata_path):
+        plateau_metadata = np.load(plateau_metadata_path, allow_pickle=True).item()
+        initial_train_losses = plateau_metadata['train_losses']
+        initial_val_losses = plateau_metadata['val_losses']
+        initial_val_accuracies = plateau_metadata['val_accuracies']
+        print(f"✅ Загружены метаданные исходного обучения ({len(initial_train_losses)} эпох)")
+    else:
+        initial_train_losses = []
+        initial_val_losses = []
+        initial_val_accuracies = []
+        print("⚠️ Метаданные исходного обучения не найдены")
     
+    # Продолжаем только с SGD
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr)
     criterion = nn.CrossEntropyLoss()
     
     # ======== Продолжение обучения с логированием ========
-    print(f"\n🚀 Продолжаем обучение на {args.post_plateau_steps} шагов...")
+    print(f"\n🚀 Продолжаем обучение на {args.post_plateau_steps} шагов с SGD...")
     
     params_vectors = []
     hessians = []
@@ -153,17 +154,11 @@ def main():
     
     data_iter = iter(train_loader)
     
-    # Получаем начальные метрики для сравнения
-    initial_val_loss, initial_val_acc = evaluate_model(model, test_loader, criterion, DEVICE)
-    print(f"📊 Начальные метрики: Val Loss = {initial_val_loss:.4f}, Val Acc = {initial_val_acc:.2f}%")
-    
     pbar = tqdm(range(args.post_plateau_steps), 
-                desc=f"Hessian tracking (lr={args.lr})",
-                ncols=130,
-                bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}] {postfix}')
+                desc=f"Hessian tracking (from {args.source_optimizer.upper()}, lr={args.lr})",
+                ncols=100)
     
     for step in pbar:
-        # Получаем данные
         try:
             images, labels = next(data_iter)
         except StopIteration:
@@ -191,58 +186,113 @@ def main():
             val_losses.append(val_loss)
             val_accuracies.append(val_acc)
             
-            # Обновляем прогресс-бар с метриками
-            val_change = val_loss - initial_val_loss
-            acc_change = val_acc - initial_val_acc
-            
-            # Вычисляем статистики гессиана
-            current_hessian = hessians[-1]
-            eigenvals = np.linalg.eigvals(current_hessian)
-            max_eigenval = np.max(np.real(eigenvals))
-            min_eigenval = np.min(np.real(eigenvals))
-            condition_number = max_eigenval / max(abs(min_eigenval), 1e-10)
-            
             pbar.set_postfix({
-                'TrLoss': f'{loss.item():.4f}',
-                'ValLoss': f'{val_loss:.4f}',
-                'ValAcc': f'{val_acc:.1f}%',
-                'ΔValLoss': f'{val_change:+.4f}',
-                'ΔValAcc': f'{acc_change:+.1f}%',
-                'MaxEig': f'{max_eigenval:.2e}',
-                'CondNum': f'{condition_number:.1e}'
+                'train_loss': f'{loss.item():.4f}',
+                'val_loss': f'{val_loss:.4f}',
+                'val_acc': f'{val_acc:.1f}%'
             })
         else:
-            # Обновляем только тренировочные метрики
-            if len(hessians) > 0:
-                current_hessian = hessians[-1]
-                eigenvals = np.linalg.eigvals(current_hessian)
-                max_eigenval = np.max(np.real(eigenvals))
-                
-                pbar.set_postfix({
-                    'TrLoss': f'{loss.item():.4f}',
-                    'ValLoss': f'{val_losses[-1]:.4f}' if val_losses else f'{initial_val_loss:.4f}',
-                    'ValAcc': f'{val_accuracies[-1]:.1f}%' if val_accuracies else f'{initial_val_acc:.1f}%',
-                    'MaxEig': f'{max_eigenval:.2e}',
-                    'Step': f'{step+1}/{args.post_plateau_steps}'
-                })
+            pbar.set_postfix({'train_loss': f'{loss.item():.4f}'})
         
         # Делаем шаг оптимизации
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
     
-    # Финальная валидация
-    final_val_loss, final_val_acc = evaluate_model(model, test_loader, criterion, DEVICE)
-    print(f"\n🏁 Финальные метрики:")
-    print(f"   Val Loss: {initial_val_loss:.4f} → {final_val_loss:.4f} (изменение: {final_val_loss - initial_val_loss:+.4f})")
-    print(f"   Val Acc:  {initial_val_acc:.2f}% → {final_val_acc:.2f}% (изменение: {final_val_acc - initial_val_acc:+.2f}%)")
+    # ======== Обновление существующих графиков ========
+    # Обновляем progress график
+    progress_plot_path = os.path.join(args.save_dir, f'progress_{args.source_optimizer}_lr{args.lr}.png')
+    final_plot_path = os.path.join(args.save_dir, f'final_{args.source_optimizer}_lr{args.lr}.png')
+    
+    def update_plot(save_path, title_suffix=""):
+        plt.figure(figsize=(15, 5))
+        
+        # График потерь с вертикальной линией
+        plt.subplot(1, 3, 1)
+        if initial_train_losses:
+            plt.plot(range(len(initial_train_losses)), initial_train_losses, 
+                    label=f'Initial ({args.source_optimizer.upper()})', alpha=0.7)
+            transition_point = len(initial_train_losses)
+            plt.axvline(x=transition_point, color='red', linestyle='--', alpha=0.8, 
+                       label='Switch to SGD')
+            # Продолжение с SGD
+            sgd_steps = range(transition_point, transition_point + len(train_losses))
+            plt.plot(sgd_steps, train_losses, label='SGD continuation', color='orange')
+        else:
+            plt.plot(train_losses, label='SGD', color='orange')
+        
+        plt.title(f'Training Loss ({args.source_optimizer.upper()} → SGD, lr={args.lr}){title_suffix}')
+        plt.xlabel('Step')
+        plt.ylabel('Loss')
+        plt.legend()
+        plt.grid(True)
+        
+        # График валидационных потерь
+        plt.subplot(1, 3, 2)
+        if initial_val_losses:
+            # Позиции валидационных точек для исходного обучения
+            if 'batches_per_epoch' in plateau_metadata:
+                batches_per_epoch = plateau_metadata['batches_per_epoch']
+                if args.source_optimizer == 'sgd':
+                    val_steps_initial = [(i+1)*100*batches_per_epoch - 1 for i in range(len(initial_val_losses))]
+                else:  # GD
+                    val_steps_initial = [(i+1)*100 - 1 for i in range(len(initial_val_losses))]
+            else:
+                val_steps_initial = list(range(99, len(initial_train_losses), 100))[:len(initial_val_losses)]
+            
+            plt.plot(val_steps_initial, initial_val_losses, 
+                    label=f'Initial ({args.source_optimizer.upper()})', marker='o', alpha=0.7)
+            transition_point = len(initial_train_losses)
+            plt.axvline(x=transition_point, color='red', linestyle='--', alpha=0.8)
+        
+        if val_losses:
+            val_steps_sgd = [len(initial_train_losses) + (i+1)*50 for i in range(len(val_losses))]
+            plt.plot(val_steps_sgd, val_losses, label='SGD continuation', 
+                    marker='s', color='orange')
+        
+        plt.title('Validation Loss')
+        plt.xlabel('Step')
+        plt.ylabel('Loss')
+        plt.legend()
+        plt.grid(True)
+        
+        # График валидационной точности
+        plt.subplot(1, 3, 3)
+        if initial_val_accuracies:
+            plt.plot(val_steps_initial[:len(initial_val_accuracies)], initial_val_accuracies, 
+                    label=f'Initial ({args.source_optimizer.upper()})', marker='o', alpha=0.7)
+            plt.axvline(x=transition_point, color='red', linestyle='--', alpha=0.8)
+        
+        if val_accuracies:
+            plt.plot(val_steps_sgd[:len(val_accuracies)], val_accuracies, label='SGD continuation', 
+                    marker='s', color='orange')
+        
+        plt.title('Validation Accuracy')
+        plt.xlabel('Step')
+        plt.ylabel('Accuracy (%)')
+        plt.legend()
+        plt.grid(True)
+        
+        plt.tight_layout()
+        plt.savefig(save_path)
+        plt.close()
+    
+    # Обновляем оба графика
+    if os.path.exists(progress_plot_path):
+        update_plot(progress_plot_path, " (Updated)")
+    if os.path.exists(final_plot_path):
+        update_plot(final_plot_path, " (Final + SGD)")
+    
+    # Создаем новый объединенный график
+    combined_plot_path = os.path.join(args.save_dir, f'combined_trajectory_{args.source_optimizer}_lr{args.lr}.png')
+    update_plot(combined_plot_path)
     
     # ======== Сохранение тензоров ========
-    params_tensor = np.array(params_vectors)  # shape: (steps, n_params)
-    hessians_tensor = np.array(hessians)      # shape: (steps, n_params, n_params)
+    params_tensor = np.array(params_vectors)
+    hessians_tensor = np.array(hessians)
     
-    params_path = os.path.join(args.save_dir, f"params_tensor_lr{args.lr}.pkl")
-    hessians_path = os.path.join(args.save_dir, f"hessians_tensor_lr{args.lr}.pkl")
+    params_path = os.path.join(args.save_dir, f"params_tensor_{args.source_optimizer}_lr{args.lr}.pkl")
+    hessians_path = os.path.join(args.save_dir, f"hessians_tensor_{args.source_optimizer}_lr{args.lr}.pkl")
     
     with open(params_path, 'wb') as f:
         pickle.dump(params_tensor, f)
@@ -252,51 +302,34 @@ def main():
     
     # ======== Сохранение метаданных ========
     metadata = {
+        'source_optimizer': args.source_optimizer,
+        'continue_optimizer': 'sgd',
         'lr': args.lr,
         'batch_size': args.batch_size,
         'post_plateau_steps': args.post_plateau_steps,
         'train_losses': train_losses,
         'val_losses': val_losses,
         'val_accuracies': val_accuracies,
-        'val_steps': list(range(49, args.post_plateau_steps, 50))[:len(val_losses)],
-        'initial_val_loss': initial_val_loss,
-        'initial_val_acc': initial_val_acc,
-        'final_val_loss': final_val_loss,
-        'final_val_acc': final_val_acc,
+        'initial_train_losses': initial_train_losses,
+        'initial_val_losses': initial_val_losses,
+        'initial_val_accuracies': initial_val_accuracies,
         'params_shape': params_tensor.shape,
         'hessians_shape': hessians_tensor.shape,
         'seed': args.seed,
         'sample_size': SAMPLE_SIZE
     }
     
-    metadata_path = os.path.join(args.save_dir, f"metadata_lr{args.lr}.pkl")
+    metadata_path = os.path.join(args.save_dir, f"metadata_{args.source_optimizer}_lr{args.lr}.pkl")
     with open(metadata_path, 'wb') as f:
         pickle.dump(metadata, f)
     
-    print(f"\n💾 Параметры сохранены: {params_path} (shape: {params_tensor.shape})")
-    print(f"💾 Гессианы сохранены: {hessians_path} (shape: {hessians_tensor.shape})")
+    print(f"\n💾 Параметры сохранены: {params_path}")
+    print(f"💾 Гессианы сохранены: {hessians_path}")
     print(f"💾 Метаданные сохранены: {metadata_path}")
-    
-    # Статистика гессианов
-    if hessians:
-        all_eigenvals = []
-        for h in hessians[::50]:  # Каждый 50-й гессиан
-            eigenvals = np.linalg.eigvals(h)
-            all_eigenvals.extend(np.real(eigenvals))
-        
-        all_eigenvals = np.array(all_eigenvals)
-        significant_eigenvals = all_eigenvals[np.abs(all_eigenvals) > 1e-6]
-        
-        print(f"\n📊 Статистика гессианов:")
-        print(f"   Всего собственных значений: {len(all_eigenvals)}")
-        print(f"   Значимых (|λ| > 1e-6): {len(significant_eigenvals)}")
-        if len(significant_eigenvals) > 0:
-            print(f"   Максимальное: {np.max(significant_eigenvals):.4e}")
-            print(f"   Минимальное: {np.min(significant_eigenvals):.4e}")
-            print(f"   Среднее: {np.mean(significant_eigenvals):.4e}")
+    print(f"📈 Графики обновлены: progress, final, combined")
     
     if val_accuracies:
-        print(f"\n🎯 Финальная точность на валидации: {val_accuracies[-1]:.2f}%")
+        print(f"🎯 Финальная точность на валидации: {val_accuracies[-1]:.2f}%")
 
 if __name__ == "__main__":
     main()

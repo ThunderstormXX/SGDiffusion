@@ -45,7 +45,7 @@ class FlexibleMLP(nn.Module):
         for i in range(num_hidden_layers):
             layers.append(nn.Linear(in_dim, hidden_dim))
             if use_relu_list[i]:
-                layers.append(nn.ReLU())
+                layers.append(nn.SiLU())
             if dropout_list[i] > 0:
                 layers.append(nn.Dropout(dropout_list[i]))
             in_dim = hidden_dim
