@@ -59,6 +59,112 @@ class FlexibleMLP(nn.Module):
         x = x.view(x.size(0), -1)    # flatten
         return self.model(x)
 
+class FlexibleCNN(nn.Module):
+    def __init__(
+        self,
+        # --- ввод ---
+        in_channels: int = 1,
+        input_downsample: int | None = None,  # если задано, сначала сожмём картинку до d x d
+        # --- свёрточная часть ---
+        conv_channels: list[int] = [32, 64],  # число каналов после каждого Conv
+        conv_kernels: list[int] | None = None,  # ядра (если None → все 3)
+        conv_strides: list[int] | None = None,  # шаги (если None → все 1)
+        conv_use_relu_list: list[bool] | None = None,  # активация после conv-блока
+        conv_dropouts: list[float] | None = None,  # dropout после активации
+        conv_use_bn: bool = True,  # BatchNorm2d после Conv
+        pool_after: list[bool] | None = None,  # ставить ли MaxPool2d(2) после блока
+        # --- neck / агрегирование ---
+        gap_size: int = 1,  # AdaptiveAvgPool2d к (gap_size x gap_size), 1 = global avg pool
+        # --- MLP (классификатор) ---
+        mlp_hidden_dim: int = 256,           # если mlp_hidden_dims=None → берём это
+        mlp_num_layers: int = 1,
+        mlp_hidden_dims: list[int] | None = None,  # переопределяет mlp_hidden_dim/mlp_num_layers
+        mlp_use_relu_list: list[bool] | None = None,
+        mlp_dropouts: list[float] | None = None,
+        # --- выход ---
+        output_dim: int = 10,
+    ):
+        super().__init__()
+
+        # ---------- настройки по умолчанию для conv ----------
+        L = len(conv_channels)
+        if conv_kernels is None:      conv_kernels = [3] * L
+        if conv_strides is None:      conv_strides = [1] * L
+        if conv_use_relu_list is None: conv_use_relu_list = [True] * L
+        if conv_dropouts is None:     conv_dropouts = [0.0] * L
+        if pool_after is None:        pool_after = [False] * L
+
+        assert len(conv_kernels) == L
+        assert len(conv_strides) == L
+        assert len(conv_use_relu_list) == L
+        assert len(conv_dropouts) == L
+        assert len(pool_after) == L
+
+        # ---------- настройки по умолчанию для mlp ----------
+        if mlp_hidden_dims is None:
+            mlp_hidden_dims = [mlp_hidden_dim] * mlp_num_layers
+        M = len(mlp_hidden_dims)
+        if mlp_use_relu_list is None: mlp_use_relu_list = [True] * M
+        if mlp_dropouts is None:      mlp_dropouts = [0.0] * M
+
+        assert len(mlp_use_relu_list) == M
+        assert len(mlp_dropouts) == M
+
+        # ---------- препроцессинг входа ----------
+        self.downsampler = (
+            nn.AdaptiveAvgPool2d((input_downsample, input_downsample))
+            if input_downsample is not None else None
+        )
+
+        # ---------- свёрточные блоки ----------
+        conv_layers = []
+        c_in = in_channels
+        for i in range(L):
+            k = conv_kernels[i]
+            s = conv_strides[i]
+            # «same»-подобная паддинга для нечётных k
+            pad = k // 2
+
+            conv_layers.append(nn.Conv2d(c_in, conv_channels[i], kernel_size=k, stride=s, padding=pad, bias=not conv_use_bn))
+            if conv_use_bn:
+                conv_layers.append(nn.BatchNorm2d(conv_channels[i]))
+            if conv_use_relu_list[i]:
+                conv_layers.append(nn.SiLU())
+            if conv_dropouts[i] > 0:
+                conv_layers.append(nn.Dropout2d(conv_dropouts[i]))
+            if pool_after[i]:
+                conv_layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
+
+            c_in = conv_channels[i]
+
+        self.conv = nn.Sequential(*conv_layers)
+
+        # ---------- neck: адаптивный пул к фикс. размеру ----------
+        self.neck = nn.AdaptiveAvgPool2d((gap_size, gap_size)) if gap_size is not None else nn.Identity()
+
+        # ---------- MLP классификатор ----------
+        mlp_layers = []
+        in_dim = c_in * (gap_size if gap_size is not None else 1) ** 2
+
+        for j in range(M):
+            mlp_layers.append(nn.Linear(in_dim, mlp_hidden_dims[j]))
+            if mlp_use_relu_list[j]:
+                mlp_layers.append(nn.SiLU())
+            if mlp_dropouts[j] > 0:
+                mlp_layers.append(nn.Dropout(mlp_dropouts[j]))
+            in_dim = mlp_hidden_dims[j]
+
+        mlp_layers.append(nn.Linear(in_dim, output_dim))
+        self.mlp = nn.Sequential(*mlp_layers)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # x: [B, C, H, W]
+        if self.downsampler is not None:
+            x = self.downsampler(x)
+        x = self.conv(x)         # [B, C*, H*, W*]
+        x = self.neck(x)         # [B, C*, gap, gap]  (gap=1 по умолчанию)
+        x = x.flatten(1)         # [B, C* * gap * gap]
+        return self.mlp(x)
 
 class CNN(nn.Module):
     def __init__(self, k=1):

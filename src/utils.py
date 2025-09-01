@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader, Subset
 from tqdm import tqdm
 import numpy as np
 import pickle
+import os 
 
 import torch.nn.functional as F
 
@@ -92,6 +93,46 @@ def MNIST(batch_size = 64, sample_size = None):
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last = True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    return train_dataset, test_dataset, train_loader, test_loader
+
+
+def load_similar_mnist_data(batch_size, sample_size=1000):
+    """Загружает данные Similar MNIST из файлов для обучения и классический MNIST для теста"""
+    from torchvision import transforms, datasets
+    from torch.utils.data import Subset
+    
+    data_dir = os.path.join(os.path.dirname(__file__), "data")
+    
+    # Загружаем похожие данные для обучения
+    x_data = torch.load(os.path.join(data_dir, "mnist_similar_x.pt"))
+    y_data = torch.load(os.path.join(data_dir, "mnist_similar_y.pt"))
+    
+    # Балансировка классов
+    samples_per_class = sample_size // 10
+    balanced_indices = []
+    for class_id in range(10):
+        class_indices = (y_data == class_id).nonzero(as_tuple=True)[0]
+        if len(class_indices) >= samples_per_class:
+            selected = class_indices[torch.randperm(len(class_indices))[:samples_per_class]]
+        else:
+            selected = class_indices
+        balanced_indices.extend(selected.tolist())
+    
+    balanced_indices = torch.tensor(balanced_indices)
+    x_data = x_data[balanced_indices]
+    y_data = y_data[balanced_indices]
+    
+    # Создаем обучающий датасет из похожих данных
+    train_dataset = torch.utils.data.TensorDataset(x_data, y_data)
+    
+    # Загружаем классический MNIST для теста
+    transform = transforms.Compose([transforms.ToTensor()])
+    test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+    
+    # Создаем загрузчики
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    
     return train_dataset, test_dataset, train_loader, test_loader
 
 def CIFAR(batch_size=64, sample_size=None):
