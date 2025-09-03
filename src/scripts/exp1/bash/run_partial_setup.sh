@@ -50,7 +50,6 @@ case $SCRIPT_NUM in
       --dataset_train "${DATASET_TRAIN}" \
       --dataset_val "${DATASET_VAL}" \
       --model "${MODEL}" \
-      --batch_size "${BATCH_SIZE}" \
       --lr "${LR}" \
       --seed "${SEED}" \
       --epochs "${EPOCHS_GD}" \
@@ -71,7 +70,7 @@ case $SCRIPT_NUM in
       --results_dir "${RESULTS_DIR}"
     ;;
   4)
-    echo "Running 4. Many runs... -> ${RESULTS_DIR}"
+    echo "Running 4. Many runs (SGD)... -> ${RESULTS_DIR}"
     python "$PYTHON_DIR/sgd_many_runs.py" \
       --dataset_train "${DATASET_TRAIN}" \
       --model "${MODEL}" \
@@ -79,6 +78,18 @@ case $SCRIPT_NUM in
       --seed "${SEED}" \
       --lrs "${LRS_LIST}" \
       --n_samples "${MANY_RUNS_SAMPLES}" \
+      --steps "${MANY_RUNS_STEPS}" \
+      --checkpoint_in "initial_after_sgd_and_gd.pt" \
+      --results_dir "${RESULTS_DIR}"
+    ;;
+  5)
+    echo "Running 5. Many runs (GD)... -> ${RESULTS_DIR}"
+    python "$PYTHON_DIR/gd_many_runs.py" \
+      --dataset_train "${DATASET_TRAIN}" \
+      --model "${MODEL}" \
+      --batch_size "${BATCH_SIZE}" \
+      --seed "${SEED}" \
+      --lrs "${LRS_LIST}" \
       --steps "${MANY_RUNS_STEPS}" \
       --checkpoint_in "initial_after_sgd_and_gd.pt" \
       --results_dir "${RESULTS_DIR}"

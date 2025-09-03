@@ -110,7 +110,7 @@ def main():
     parser.add_argument('--steps', type=int, required=True)
     parser.add_argument('--checkpoint_in', required=True)
     parser.add_argument('--results_dir', default='src/scripts/exp_results')
-    parser.add_argument('--sample_size', type=int, default=6000)
+    parser.add_argument('--sample_size', type=int, default=6400)
     parser.add_argument('--auto_device', action='store_true')
     args = parser.parse_args()
 

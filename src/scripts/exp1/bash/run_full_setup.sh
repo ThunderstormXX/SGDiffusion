@@ -18,7 +18,7 @@ chmod +x "${PARTIAL_SH}" 2>/dev/null || true
 
 echo "=== Full setup ${SETUP_NUM}: start ==="
 
-for SCRIPT_NUM in 1 2 3 4; do
+for SCRIPT_NUM in 1 2 3 4 5; do
   echo "--- Running step ${SCRIPT_NUM} for setup ${SETUP_NUM} ---"
   "${PARTIAL_SH}" "${SETUP_NUM}" "${SCRIPT_NUM}"
 done
