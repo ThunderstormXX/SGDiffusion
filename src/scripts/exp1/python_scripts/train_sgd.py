@@ -5,14 +5,14 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.auto import tqdm
-
+from torch.utils.data import DataLoader, RandomSampler, BatchSampler
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from src.model import FlexibleMLP, FlexibleCNN
 from src.utils import MNIST, load_similar_mnist_data
-
+from src.utils import load_data_with_replacement, load_data
 
 def get_device(force_auto: bool = False) -> torch.device:
     if force_auto:
@@ -27,35 +27,6 @@ def seed_worker(worker_id: int):
     worker_seed = torch.initial_seed() % 2**32
     np.random.seed(worker_seed)
     random.seed(worker_seed)
-
-
-def load_data(dataset_train: str, dataset_val: str, batch_size: int, sample_size: int | None, seed: int):
-    if dataset_train == "mnist":
-        train_dataset, test_dataset, _, _ = MNIST(batch_size=batch_size, sample_size=sample_size)
-    else:
-        train_dataset, test_dataset, _, _ = load_similar_mnist_data(
-            batch_size=batch_size, sample_size=sample_size or 1000
-        )
-
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=batch_size,
-        shuffle=True,
-        drop_last=True,
-        num_workers=0,
-        worker_init_fn=seed_worker
-    )
-
-    val_loader = DataLoader(
-        test_dataset,
-        batch_size=batch_size,
-        shuffle=False,
-        drop_last=False,
-        num_workers=0,
-        worker_init_fn=seed_worker
-    )
-
-    return train_dataset, test_dataset, train_loader, val_loader
 
 
 def create_model(model_type: str):
@@ -82,6 +53,7 @@ def main():
     p.add_argument("--results_dir", default="src/scripts/exp_results")
     p.add_argument("--sample_size", type=int, default=6400)
     p.add_argument("--auto_device", action="store_true")
+    p.add_argument("--data_loader", default='default')
     args = p.parse_args()
 
     torch.manual_seed(args.seed)
@@ -89,8 +61,13 @@ def main():
     np.random.seed(args.seed)
     device = get_device(args.auto_device)
 
-    train_ds, val_ds, train_loader, val_loader = load_data(
-        args.dataset_train, args.dataset_val, args.batch_size, args.sample_size, args.seed
+    load_data_fn = (
+        load_data_with_replacement if args.data_loader == 'replacement'
+        else load_data if args.data_loader == 'default'
+        else None
+    )
+    train_ds, val_ds, train_loader, val_loader = load_data_fn(
+        args.dataset_train, args.batch_size, args.sample_size, args.seed
     )
 
     model = create_model(args.model).to(device)

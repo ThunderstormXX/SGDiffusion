@@ -5,9 +5,9 @@ from tqdm import tqdm
 import numpy as np
 import pickle
 import os 
-
+import random
 import torch.nn.functional as F
-
+from torch.utils.data import DataLoader, RandomSampler, BatchSampler
 
 class Logger:
     def __init__(self) -> None:
@@ -90,6 +90,9 @@ def MNIST(batch_size = 64, sample_size = None):
     if sample_size is not None:
         indices = torch.randperm(len(train_dataset)).tolist()[:sample_size]
         train_dataset = Subset(train_dataset, indices)
+
+        indices = torch.randperm(len(test_dataset)).tolist()[:sample_size]
+        test_dataset = Subset(test_dataset, indices)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last = True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
@@ -337,3 +340,70 @@ def total_variation_loss_model(model):
             loss += total_variation_loss(param)
     return loss
 
+
+
+def seed_worker(worker_id: int):
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+# random batches (with replacement), all batches exactly batch_size
+def load_data_with_replacement(dataset_train: str, batch_size: int, sample_size: int, seed: int):
+    if dataset_train == "mnist":
+        train_dataset, test_dataset, _, _ = MNIST(batch_size=batch_size, sample_size=sample_size)
+    else:
+        train_dataset, test_dataset, _, _ = load_similar_mnist_data(
+            batch_size=batch_size, sample_size=sample_size or 1000
+        )
+
+    N = len(train_dataset)
+    eff = (N // batch_size) * batch_size  # multiple of batch_size
+    g = torch.Generator().manual_seed(seed)
+
+    sampler = RandomSampler(train_dataset, replacement=True, num_samples=eff, generator=g)
+    batch_sampler = BatchSampler(sampler, batch_size=batch_size, drop_last=True)
+
+    train_loader = DataLoader(
+        train_dataset,
+        batch_sampler=batch_sampler,
+        num_workers=0,
+        worker_init_fn=seed_worker,
+    )
+
+    val_loader = DataLoader(
+        test_dataset,
+        batch_size=512,
+        shuffle=False,
+        drop_last=False,
+        num_workers=0,
+        worker_init_fn=seed_worker
+    )
+    return train_dataset, test_dataset, train_loader, val_loader
+
+def load_data(dataset_train: str, batch_size: int, sample_size: int, seed: int):
+    if dataset_train == "mnist":
+        train_dataset, test_dataset, _, _ = MNIST(batch_size=batch_size, sample_size=sample_size)
+    else:
+        train_dataset, test_dataset, _, _ = load_similar_mnist_data(
+            batch_size=batch_size, sample_size=sample_size or 1000
+        )
+
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        drop_last=True,
+        num_workers=0,
+        worker_init_fn=seed_worker
+    )
+
+    val_loader = DataLoader(
+        test_dataset,
+        batch_size=512,
+        shuffle=False,
+        drop_last=False,
+        num_workers=0,
+        worker_init_fn=seed_worker
+    )
+
+    return train_dataset, test_dataset, train_loader, val_loader

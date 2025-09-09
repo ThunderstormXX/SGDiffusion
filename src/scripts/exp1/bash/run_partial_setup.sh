@@ -39,10 +39,12 @@ case $SCRIPT_NUM in
       --dataset_val "${DATASET_VAL}" \
       --model "${MODEL}" \
       --batch_size "${BATCH_SIZE}" \
+      --sample_size "${SAMPLE_SIZE}"\
       --lr "${LR}" \
       --seed "${SEED}" \
       --epochs "${EPOCHS_SGD}" \
-      --results_dir "${RESULTS_DIR}"
+      --results_dir "${RESULTS_DIR}" \
+      --data_loader "${DATALOADER}"
     ;;
   2)
     echo "Running 2. GD Training... -> ${RESULTS_DIR}"
@@ -51,10 +53,11 @@ case $SCRIPT_NUM in
       --dataset_val "${DATASET_VAL}" \
       --model "${MODEL}" \
       --lr "${LR}" \
+      --sample_size "${SAMPLE_SIZE}"\
       --seed "${SEED}" \
       --epochs "${EPOCHS_GD}" \
       --checkpoint_in "initial_after_sgd.pt" \
-      --results_dir "${RESULTS_DIR}"
+      --results_dir "${RESULTS_DIR}"\
     ;;
   3)
     echo "Running 3. Hessian trajectories... -> ${RESULTS_DIR}"
@@ -63,11 +66,13 @@ case $SCRIPT_NUM in
       --dataset_val "${DATASET_VAL}" \
       --model "${MODEL}" \
       --batch_size "${BATCH_SIZE}" \
+      --sample_size "${SAMPLE_SIZE}"\
       --seed "${SEED}" \
       --lrs "${LRS_LIST}" \
       --steps "${HESSIAN_STEPS}" \
       --checkpoint_in "initial_after_sgd_and_gd.pt" \
-      --results_dir "${RESULTS_DIR}"
+      --results_dir "${RESULTS_DIR}"\
+      --data_loader "${DATALOADER}"
     ;;
   4)
     echo "Running 4. Many runs (SGD)... -> ${RESULTS_DIR}"
@@ -77,10 +82,12 @@ case $SCRIPT_NUM in
       --batch_size "${BATCH_SIZE}" \
       --seed "${SEED}" \
       --lrs "${LRS_LIST}" \
+      --sample_size "${SAMPLE_SIZE}" \
       --n_samples "${MANY_RUNS_SAMPLES}" \
       --steps "${MANY_RUNS_STEPS}" \
       --checkpoint_in "initial_after_sgd_and_gd.pt" \
-      --results_dir "${RESULTS_DIR}"
+      --results_dir "${RESULTS_DIR}" \
+      --data_loader "${DATALOADER}"
     ;;
   5)
     echo "Running 5. Many runs (GD)... -> ${RESULTS_DIR}"
@@ -88,11 +95,14 @@ case $SCRIPT_NUM in
       --dataset_train "${DATASET_TRAIN}" \
       --model "${MODEL}" \
       --batch_size "${BATCH_SIZE}" \
+      --sample_size "${SAMPLE_SIZE}" \
       --seed "${SEED}" \
       --lrs "${LRS_LIST}" \
       --steps "${MANY_RUNS_STEPS}" \
       --checkpoint_in "initial_after_sgd_and_gd.pt" \
-      --results_dir "${RESULTS_DIR}"
+      --results_dir "${RESULTS_DIR}" \
+      --lr_scaling "${GD_SCALING}" \
+      --dtype "${DTYPE}" 
     ;;
   *)
     echo "Unknown script number: $SCRIPT_NUM"

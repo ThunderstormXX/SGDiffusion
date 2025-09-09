@@ -11,6 +11,7 @@ if PROJECT_ROOT not in sys.path:
 
 from src.model import FlexibleMLP, FlexibleCNN
 from src.utils import MNIST, load_similar_mnist_data
+from src.utils import load_data_with_replacement, load_data
 
 def get_device(force_auto: bool = False) -> torch.device:
     if force_auto:
@@ -24,27 +25,7 @@ def seed_worker(worker_id: int):
     np.random.seed(worker_seed)
     random.seed(worker_seed)
 
-# random batches (with replacement), all batches exactly batch_size
-def load_train_loader(dataset_train: str, batch_size: int, sample_size: int, seed: int):
-    if dataset_train == "mnist":
-        train_dataset, _, _, _ = MNIST(batch_size=batch_size, sample_size=sample_size)
-    else:
-        train_dataset, _, _, _ = load_similar_mnist_data(batch_size=batch_size, sample_size=sample_size)
 
-    N = len(train_dataset)
-    eff = (N // batch_size) * batch_size  # multiple of batch_size
-    g = torch.Generator().manual_seed(seed)
-
-    sampler = RandomSampler(train_dataset, replacement=True, num_samples=eff, generator=g)
-    batch_sampler = BatchSampler(sampler, batch_size=batch_size, drop_last=True)
-
-    train_loader = DataLoader(
-        train_dataset,
-        batch_sampler=batch_sampler,
-        num_workers=0,
-        worker_init_fn=seed_worker,
-    )
-    return train_loader, N
 
 def create_model(model_type):
     if model_type == 'mlp':
@@ -112,12 +93,19 @@ def main():
     parser.add_argument('--results_dir', default='src/scripts/exp_results')
     parser.add_argument('--sample_size', type=int, default=6400)
     parser.add_argument('--auto_device', action='store_true')
+    parser.add_argument("--data_loader", default='default')
     args = parser.parse_args()
 
     device = get_device(args.auto_device)
     lrs = [float(x) for x in args.lrs.split(',')]
+    load_data_fn = (
+        load_data_with_replacement if args.data_loader == 'replacement'
+        else load_data if args.data_loader == 'default'
+        else None
+    )
+    train_dataset, test_dataset, train_loader, val_loader = load_data_fn(  args.dataset_train, args.batch_size, args.sample_size, args.seed)
+    train_size = len(train_dataset)
 
-    train_loader, train_size = load_train_loader(args.dataset_train, args.batch_size, args.sample_size, args.seed)
     steps_per_epoch = max(1, len(train_loader))  # сколько батчей в «эпохе»
     criterion = nn.CrossEntropyLoss()
 

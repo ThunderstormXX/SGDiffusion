@@ -29,9 +29,11 @@ echo "Running 4. Many runs... -> ${RESULTS_DIR}"
       --dataset_train "${DATASET_TRAIN}" \
       --model "${MODEL}" \
       --batch_size "${BATCH_SIZE}" \
+      --sample_size "${SAMPLE_SIZE}" \
       --seed "${SEED}" \
       --lrs "${LRS_LIST}" \
-      --n_samples "${MANY_RUNS_SAMPLES}" \
       --steps "${MANY_RUNS_STEPS}" \
       --checkpoint_in "initial_after_sgd_and_gd.pt" \
-      --results_dir "${RESULTS_DIR}"
+      --results_dir "${RESULTS_DIR}" \
+      --data_loader "${DATALOADER}" \
+      --lr_scaling "${GD_SCALING}"

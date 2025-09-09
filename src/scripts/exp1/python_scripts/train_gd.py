@@ -5,14 +5,14 @@ from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 import matplotlib.pyplot as plt
 import numpy as np
-
+from torch.utils.data import DataLoader, RandomSampler, BatchSampler
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from src.model import FlexibleMLP, FlexibleCNN
 from src.utils import MNIST, load_similar_mnist_data
-
+from src.utils import load_data
 
 def get_device(force_auto: bool = False) -> torch.device:
     if force_auto:
@@ -22,40 +22,10 @@ def get_device(force_auto: bool = False) -> torch.device:
             return torch.device("mps")
     return torch.device("cpu")
 
-
 def seed_worker(worker_id: int):
     worker_seed = torch.initial_seed() % 2**32
     np.random.seed(worker_seed)
     random.seed(worker_seed)
-
-
-def load_data(dataset_train: str, dataset_val: str, sample_size: int | None, seed: int):
-    if dataset_train == "mnist":
-        train_dataset, test_dataset, _, _ = MNIST(batch_size=1, sample_size=sample_size)
-    else:
-        train_dataset, test_dataset, _, _ = load_similar_mnist_data(
-            batch_size=1, sample_size=sample_size or 1000
-        )
-
-    # --- для GD батч = весь датасет
-    train_loader_full = DataLoader(
-        train_dataset,
-        batch_size=len(train_dataset),
-        shuffle=False,
-        num_workers=0,
-        worker_init_fn=seed_worker
-    )
-
-    val_loader = DataLoader(
-        test_dataset,
-        batch_size=512,
-        shuffle=False,
-        num_workers=0,
-        worker_init_fn=seed_worker
-    )
-
-    return train_dataset, test_dataset, train_loader_full, val_loader
-
 
 def create_model(model_type):
     if model_type == 'mlp':
@@ -67,7 +37,6 @@ def create_model(model_type):
             pool_after=[False], gap_size=1, mlp_hidden_dims=[11],
             mlp_use_relu_list=[True], mlp_dropouts=[0.0], output_dim=10
         )
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -88,8 +57,10 @@ def main():
     random.seed(args.seed)
 
     # загружаем данные
-    train_ds, val_ds, train_loader_full, val_loader = load_data(
-        args.dataset_train, args.dataset_val, args.sample_size, args.seed
+    load_data_fn = load_data ## WITHOUT REPLACEMENT
+    batch_size = args.sample_size
+    train_ds, val_ds, train_loader_full, val_loader = load_data_fn(
+        args.dataset_train, batch_size , args.sample_size, args.seed
     )
 
     model = create_model(args.model).to(device)
@@ -105,16 +76,33 @@ def main():
           f"seed={args.seed}, params={n_params}")
 
     train_losses, val_losses, val_accs = [], [], []
+    grad_norms = []  # --- NEW
 
-    for epoch in tqdm(range(args.epochs), desc="Epochs (GD)"):
+    # --- NEW: tqdm по эпохам с динамическим постфиксом
+    pbar = tqdm(range(args.epochs), desc="Epochs (GD)")
+    for epoch in pbar:
         # --- Train (один батч = весь датасет)
         model.train()
+        current_grad_norm = None   # --- NEW
+        current_train_loss = None  # --- NEW
         for data, target in train_loader_full:
             data, target = data.to(device), target.to(device)
             optimizer.zero_grad()
             output = model(data)
             loss = criterion(output, target)
             loss.backward()
+
+            # --- NEW: считаем L2-норму полного градиента
+            total_norm_sq = 0.0
+            for p in model.parameters():
+                if p.grad is not None:
+                    pn = p.grad.detach().norm(2).item()
+                    total_norm_sq += pn * pn
+            grad_norm = float(total_norm_sq ** 0.5)
+            grad_norms.append(grad_norm)
+            current_grad_norm = grad_norm
+            current_train_loss = float(loss.item())
+
             optimizer.step()
             train_losses.append(loss.item())
 
@@ -128,17 +116,37 @@ def main():
                 vloss += criterion(output, target).item()
                 pred = output.argmax(dim=1, keepdim=False)
                 correct += (pred == target).sum().item()
-        val_losses.append(vloss / max(1, len(val_loader)))
-        val_accs.append(correct / len(val_loader.dataset))
+        current_val_loss = vloss / max(1, len(val_loader))
+        current_val_acc = correct / len(val_loader.dataset)
+        val_losses.append(current_val_loss)
+        val_accs.append(current_val_acc)
+
+        # --- NEW: обновляем строку tqdm текущими метриками
+        pbar.set_postfix({
+            "grad": f"{current_grad_norm:.3e}" if current_grad_norm is not None else "n/a",
+            "train": f"{current_train_loss:.4f}" if current_train_loss is not None else "n/a",
+            "val": f"{current_val_loss:.4f}",
+            "acc": f"{current_val_acc:.4f}",
+        })
 
     os.makedirs(args.results_dir, exist_ok=True)
     torch.save(model.state_dict(), os.path.join(args.results_dir, "initial_after_sgd_and_gd.pt"))
 
-    logs = {'train_losses': train_losses, 'val_losses': val_losses, 'val_accs': val_accs}
+    logs = {
+        'train_losses': train_losses,
+        'val_losses': val_losses,
+        'val_accs': val_accs,
+        'grad_norms': grad_norms  # --- NEW
+    }
     logs_path = os.path.join(args.results_dir, "logs_gd.json")
     with open(logs_path, 'w') as f:
         json.dump(logs, f)
     print(f"[saved] {logs_path}")
+
+    # --- NEW: также сохраняем в .npy
+    npy_path = os.path.join(args.results_dir, "grad_norms_gd.npy")
+    np.save(npy_path, np.array(grad_norms, dtype=np.float64))
+    print(f"[saved] {npy_path}")
 
     # --- графики
     epochs = np.arange(1, args.epochs + 1)
@@ -155,6 +163,18 @@ def main():
     plt.savefig(fig_path)
     print(f"[saved] {fig_path}")
 
+    # --- NEW: лог-лог график нормы градиента (по шагам)
+    plt.figure(figsize=(6, 4))
+    steps = np.arange(1, len(grad_norms) + 1)
+    plt.loglog(steps, grad_norms)
+    plt.xlabel('Step')
+    plt.ylabel('||grad||_2')
+    plt.title('Gradient norm (log-log)')
+    plt.grid(True, which='both', linestyle='--', alpha=0.3)
+    grad_fig_path = os.path.join(args.results_dir, "grad_norm_loglog_gd.png")
+    plt.tight_layout()
+    plt.savefig(grad_fig_path)
+    print(f"[saved] {grad_fig_path}")
 
 if __name__ == '__main__':
     main()

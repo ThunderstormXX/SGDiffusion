@@ -1,0 +1,14 @@
+{
+  "weights_file": "src/scripts/exp1/exp_results/setup1/weights_lr0.1.pt",
+  "n_samples": 1000,
+  "n_steps": 1111,
+  "end_step_index": 1110,
+  "n_params": 386,
+  "val_loss_mean": 0.39389386773109436,
+  "val_loss_std": 0.005807666573673487,
+  "val_acc_mean": 0.8838136196136475,
+  "val_acc_std": 0.0024237476754933596,
+  "mean_model_val_loss": 0.3845884348869324,
+  "mean_model_val_acc": 0.8875,
+  "csv": "src/scripts/exp1/exp_results/setup1/val_distribution/weights_lr0.1__val_metrics.csv"
+}

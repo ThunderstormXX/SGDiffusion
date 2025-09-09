@@ -3,13 +3,14 @@ import os, sys, argparse, random, numpy as np, gc, json
 import torch, torch.nn as nn, torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
-
+from torch.utils.data import DataLoader, RandomSampler, BatchSampler
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from src.model import FlexibleMLP, FlexibleCNN
 from src.utils import MNIST, load_similar_mnist_data
+from src.utils import load_data_with_replacement, load_data
 
 
 def get_device(force_auto: bool = False) -> torch.device:
@@ -23,36 +24,6 @@ def seed_worker(worker_id: int):
     worker_seed = torch.initial_seed() % 2**32
     np.random.seed(worker_seed)
     random.seed(worker_seed)
-
-
-def load_data(dataset_train: str, batch_size: int, sample_size: int | None, seed: int):
-    if dataset_train == "mnist":
-        train_dataset, test_dataset, _, _ = MNIST(batch_size=batch_size, sample_size=sample_size)
-    else:
-        train_dataset, test_dataset, _, _ = load_similar_mnist_data(
-            batch_size=batch_size, sample_size=sample_size or 1000
-        )
-
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=batch_size,
-        shuffle=True,
-        drop_last=True,
-        num_workers=0,
-        worker_init_fn=seed_worker
-    )
-
-    val_loader = DataLoader(
-        test_dataset,
-        batch_size=512,
-        shuffle=False,
-        drop_last=False,
-        num_workers=0,
-        worker_init_fn=seed_worker
-    )
-
-    return train_dataset, test_dataset, train_loader, val_loader
-
 
 def create_model(model_type):
     if model_type == 'mlp':
@@ -106,12 +77,18 @@ def main():
     parser.add_argument('--results_dir', default='src/scripts/exp_results')
     parser.add_argument('--sample_size', type=int, default=6400)
     parser.add_argument('--auto_device', action='store_true')
+    parser.add_argument("--data_loader", default='default')
     args = parser.parse_args()
 
     device = get_device(args.auto_device)
     lrs = [float(x) for x in args.lrs.split(',')]
 
-    train_dataset, test_dataset, train_loader, val_loader = load_data(
+    load_data_fn = (
+        load_data_with_replacement if args.data_loader == 'replacement'
+        else load_data if args.data_loader == 'default'
+        else None
+    )
+    train_dataset, test_dataset, train_loader, val_loader = load_data_fn(
         args.dataset_train, args.batch_size, args.sample_size, args.seed
     )
     criterion = nn.CrossEntropyLoss()
