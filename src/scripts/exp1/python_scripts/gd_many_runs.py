@@ -11,7 +11,7 @@ from src.model import FlexibleMLP, FlexibleCNN
 from src.utils import load_data
 
 # -------------------- утилиты --------------------
-def get_device(force_auto: bool = False) -> torch.device:
+def get_device(force_auto: bool = True) -> torch.device:
     if force_auto:
         if torch.cuda.is_available(): 
             return torch.device("cuda")

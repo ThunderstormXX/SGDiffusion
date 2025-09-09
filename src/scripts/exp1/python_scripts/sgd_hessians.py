@@ -13,7 +13,7 @@ from src.model import FlexibleMLP, FlexibleCNN
 from src.utils import MNIST, load_similar_mnist_data
 from src.utils import load_data_with_replacement, load_data
 
-def get_device(force_auto: bool = False) -> torch.device:
+def get_device(force_auto: bool = True) -> torch.device:
     if force_auto:
         if torch.cuda.is_available(): return torch.device("cuda")
         if hasattr(torch.backends, "mps") and torch.backends.mps.is_available(): return torch.device("mps")
