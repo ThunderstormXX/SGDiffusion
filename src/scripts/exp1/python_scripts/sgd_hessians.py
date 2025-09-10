@@ -94,9 +94,10 @@ def main():
     parser.add_argument('--sample_size', type=int, default=6400)
     parser.add_argument('--auto_device', action='store_true')
     parser.add_argument("--data_loader", default='default')
+    parser.add_argument('--device', default='cpu')
     args = parser.parse_args()
 
-    device = get_device(args.auto_device)
+    device = args.device
     lrs = [float(x) for x in args.lrs.split(',')]
     load_data_fn = (
         load_data_with_replacement if args.data_loader == 'replacement'

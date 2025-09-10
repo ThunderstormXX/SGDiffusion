@@ -49,9 +49,10 @@ def main():
     parser.add_argument('--checkpoint_in', required=True)
     parser.add_argument('--results_dir', default='src/scripts/exp_results')
     parser.add_argument('--sample_size', type=int, default=6400)
+    parser.add_argument('--device', default='cpu')
     args = parser.parse_args()
 
-    device = get_device()
+    device = args.device
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
     random.seed(args.seed)

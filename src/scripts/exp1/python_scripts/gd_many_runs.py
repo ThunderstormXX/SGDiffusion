@@ -70,6 +70,7 @@ def main():
     parser.add_argument("--lr_scaling", default='default')
     parser.add_argument("--dtype", default="float32",
                         help="torch dtype: float32, float64, bfloat16, float16")
+    parser.add_argument('--device', default='cpu')
     args = parser.parse_args()
 
     # --- dtype mapping ---
@@ -83,7 +84,7 @@ def main():
         raise ValueError(f"Unsupported dtype {args.dtype}. Choices: {list(dtype_map.keys())}")
     dtype = dtype_map[args.dtype.lower()]
 
-    device = get_device(args.auto_device)
+    device = args.device
     lrs = [float(x) for x in args.lrs.split(',')]
 
     load_data_fn = load_data ## WITHOUT REPLACEMENT

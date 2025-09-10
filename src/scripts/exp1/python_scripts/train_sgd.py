@@ -54,12 +54,13 @@ def main():
     p.add_argument("--sample_size", type=int, default=6400)
     p.add_argument("--auto_device", action="store_true")
     p.add_argument("--data_loader", default='default')
+    p.add_argument('--device', default='cpu')
     args = p.parse_args()
 
     torch.manual_seed(args.seed)
     random.seed(args.seed)
     np.random.seed(args.seed)
-    device = get_device(args.auto_device)
+    device = args.device
 
     load_data_fn = (
         load_data_with_replacement if args.data_loader == 'replacement'

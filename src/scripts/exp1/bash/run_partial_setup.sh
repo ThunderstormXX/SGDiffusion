@@ -44,7 +44,8 @@ case $SCRIPT_NUM in
       --seed "${SEED}" \
       --epochs "${EPOCHS_SGD}" \
       --results_dir "${RESULTS_DIR}" \
-      --data_loader "${DATALOADER}"
+      --data_loader "${DATALOADER}"\
+      --device "${DEVICE}"
     ;;
   2)
     echo "Running 2. GD Training... -> ${RESULTS_DIR}"
@@ -58,6 +59,7 @@ case $SCRIPT_NUM in
       --epochs "${EPOCHS_GD}" \
       --checkpoint_in "initial_after_sgd.pt" \
       --results_dir "${RESULTS_DIR}"\
+      --device "${DEVICE}"
     ;;
   3)
     echo "Running 3. Hessian trajectories... -> ${RESULTS_DIR}"
@@ -72,7 +74,8 @@ case $SCRIPT_NUM in
       --steps "${HESSIAN_STEPS}" \
       --checkpoint_in "initial_after_sgd_and_gd.pt" \
       --results_dir "${RESULTS_DIR}"\
-      --data_loader "${DATALOADER}"
+      --data_loader "${DATALOADER}"\
+      --device "${DEVICE}"
     ;;
   4)
     echo "Running 4. Many runs (SGD)... -> ${RESULTS_DIR}"
@@ -87,7 +90,8 @@ case $SCRIPT_NUM in
       --steps "${MANY_RUNS_STEPS}" \
       --checkpoint_in "initial_after_sgd_and_gd.pt" \
       --results_dir "${RESULTS_DIR}" \
-      --data_loader "${DATALOADER}"
+      --data_loader "${DATALOADER}"\
+      --device "${DEVICE}"
     ;;
   5)
     echo "Running 5. Many runs (GD)... -> ${RESULTS_DIR}"
@@ -102,7 +106,8 @@ case $SCRIPT_NUM in
       --checkpoint_in "initial_after_sgd_and_gd.pt" \
       --results_dir "${RESULTS_DIR}" \
       --lr_scaling "${GD_SCALING}" \
-      --dtype "${DTYPE}" 
+      --dtype "${DTYPE}"\
+      --device "${DEVICE}"
     ;;
   *)
     echo "Unknown script number: $SCRIPT_NUM"
