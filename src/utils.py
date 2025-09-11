@@ -401,13 +401,35 @@ def load_data(dataset_train: str, batch_size: int, sample_size: int, seed: int):
 
     return train_dataset, test_dataset, train_loader, val_loader
 
-def load_saved_data(train_path: str, test_path: str, batch_size: int, shuffle_train: bool = True):
+def load_saved_data(train_path: str, test_path: str, batch_size: int, shuffle_train: bool = True, replacement: bool = False, seed: int = 42 ):
     """Загружает сохранённые (X, y) тензоры и возвращает датасеты + лоадеры"""
     X_train, y_train = torch.load(train_path, weights_only=False)
     X_test, y_test = torch.load(test_path, weights_only=False)
 
     train_ds = TensorDataset(X_train, y_train)
     test_ds = TensorDataset(X_test, y_test)
+
+    if replacement:
+        N = len(train_ds)
+        eff = (N // batch_size) * batch_size  # multiple of batch_size
+        if eff != N:
+            raise Exception('Выборка кратна должна юыть батчу иначе не сойдется с GD')
+        
+        g = torch.Generator().manual_seed(seed)
+        sampler = RandomSampler(train_ds, replacement=True, num_samples=eff, generator=g)
+        batch_sampler = BatchSampler(sampler, batch_size=batch_size, drop_last=True)
+
+        train_loader = DataLoader(
+            train_ds,
+            batch_sampler=batch_sampler
+        )
+
+        val_loader = DataLoader(
+            test_ds,
+            batch_size=512,
+            shuffle=False,
+        )
+        return train_ds, test_ds, train_loader, val_loader
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=shuffle_train, drop_last=True)
     test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False)

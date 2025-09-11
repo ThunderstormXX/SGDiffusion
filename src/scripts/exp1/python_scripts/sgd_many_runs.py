@@ -90,11 +90,11 @@ def main():
     else:
         Exception('пока не надо similar data')
     load_data_fn = load_saved_data
+    replacement = args.data_loader == 'replacement'
     train_ds, val_ds, train_loader, val_loader = load_data_fn(
-        train_path=train_path, test_path=test_path, batch_size=args.batch_size
+        train_path=train_path, test_path=test_path, batch_size=args.batch_size, replacement=replacement
     )
 
-    
     criterion = nn.CrossEntropyLoss()
 
     os.makedirs(args.results_dir, exist_ok=True)
