@@ -8,6 +8,7 @@ import os
 import random
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, RandomSampler, BatchSampler
+from torch.utils.data import DataLoader, TensorDataset
 
 class Logger:
     def __init__(self) -> None:
@@ -74,27 +75,21 @@ class Logger:
 LOGGER = Logger()
 
 
-def MNIST(batch_size = 64, sample_size = None):
+def MNIST(batch_size=64, sample_size=None):
     # Загрузка и подготовка данных
     transform = transforms.Compose([
-        # transforms.Resize(32),  # Увеличиваем размер изображений до 32x32
-        # transforms.Grayscale(3),  # Преобразуем в 3 канала
         transforms.ToTensor(),
-        # transforms.Normalize((0.5,), (0.5,))  # Нормализация для одного канала, дублируется для всех трех
     ])
 
     train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
     test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
 
-    # Если указано sample_size, то берем подвыборку из train_dataset
+    # Если указан sample_size, берем первые элементы
     if sample_size is not None:
-        indices = torch.randperm(len(train_dataset)).tolist()[:sample_size]
-        train_dataset = Subset(train_dataset, indices)
+        train_dataset = Subset(train_dataset, range(sample_size))
+        test_dataset = Subset(test_dataset, range(sample_size))
 
-        indices = torch.randperm(len(test_dataset)).tolist()[:sample_size]
-        test_dataset = Subset(test_dataset, indices)
-
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last = True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     return train_dataset, test_dataset, train_loader, test_loader
 
@@ -110,15 +105,12 @@ def load_similar_mnist_data(batch_size, sample_size=1000):
     x_data = torch.load(os.path.join(data_dir, "mnist_similar_x.pt"))
     y_data = torch.load(os.path.join(data_dir, "mnist_similar_y.pt"))
     
-    # Балансировка классов
+    # Балансировка классов (берём первые samples_per_class для каждого класса)
     samples_per_class = sample_size // 10
     balanced_indices = []
     for class_id in range(10):
         class_indices = (y_data == class_id).nonzero(as_tuple=True)[0]
-        if len(class_indices) >= samples_per_class:
-            selected = class_indices[torch.randperm(len(class_indices))[:samples_per_class]]
-        else:
-            selected = class_indices
+        selected = class_indices[:samples_per_class]  # ← без случайности
         balanced_indices.extend(selected.tolist())
     
     balanced_indices = torch.tensor(balanced_indices)
@@ -137,6 +129,7 @@ def load_similar_mnist_data(batch_size, sample_size=1000):
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     
     return train_dataset, test_dataset, train_loader, test_loader
+
 
 def CIFAR(batch_size=64, sample_size=None):
     transform = transforms.Compose([
@@ -407,3 +400,16 @@ def load_data(dataset_train: str, batch_size: int, sample_size: int, seed: int):
     )
 
     return train_dataset, test_dataset, train_loader, val_loader
+
+def load_saved_data(train_path: str, test_path: str, batch_size: int, shuffle_train: bool = True):
+    """Загружает сохранённые (X, y) тензоры и возвращает датасеты + лоадеры"""
+    X_train, y_train = torch.load(train_path, weights_only=False)
+    X_test, y_test = torch.load(test_path, weights_only=False)
+
+    train_ds = TensorDataset(X_train, y_train)
+    test_ds = TensorDataset(X_test, y_test)
+
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=shuffle_train, drop_last=True)
+    test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False)
+
+    return train_ds, test_ds, train_loader, test_loader

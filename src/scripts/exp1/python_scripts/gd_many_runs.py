@@ -8,7 +8,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from src.model import FlexibleMLP, FlexibleCNN
-from src.utils import load_data
+from src.utils import load_saved_data
 
 # -------------------- утилиты --------------------
 def get_device(force_auto: bool = True) -> torch.device:
@@ -87,14 +87,16 @@ def main():
     device = args.device
     lrs = [float(x) for x in args.lrs.split(',')]
 
-    load_data_fn = load_data ## WITHOUT REPLACEMENT
- 
+    if args.dataset_train == 'mnist': 
+        train_path = 'src/data/mnist_train.pt'
+        test_path = 'src/data/mnist_test.pt'
+    else:
+        Exception('пока не надо similar data')
+    load_data_fn = load_saved_data
     train_ds, val_ds, train_loader_full, val_loader = load_data_fn(
-        dataset_train=args.dataset_train,
-        batch_size=args.sample_size,
-        sample_size=args.sample_size,
-        seed=args.seed
+        train_path=train_path, test_path=test_path, batch_size=args.sample_size
     )
+    
     criterion = nn.CrossEntropyLoss()
 
     os.makedirs(args.results_dir, exist_ok=True)

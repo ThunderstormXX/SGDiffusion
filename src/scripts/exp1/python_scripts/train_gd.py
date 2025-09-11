@@ -12,7 +12,7 @@ if PROJECT_ROOT not in sys.path:
 
 from src.model import FlexibleMLP, FlexibleCNN
 from src.utils import MNIST, load_similar_mnist_data
-from src.utils import load_data
+from src.utils import load_saved_data
 
 def get_device(force_auto: bool = True) -> torch.device:
     if force_auto:
@@ -57,11 +57,16 @@ def main():
     np.random.seed(args.seed)
     random.seed(args.seed)
 
-    # загружаем данные
-    load_data_fn = load_data ## WITHOUT REPLACEMENT
+
+    if args.dataset_train == 'mnist': 
+        train_path = 'src/data/mnist_train.pt'
+        test_path = 'src/data/mnist_test.pt'
+    else:
+        Exception('пока не надо similar data')
     batch_size = args.sample_size
+    load_data_fn = load_saved_data
     train_ds, val_ds, train_loader_full, val_loader = load_data_fn(
-        args.dataset_train, batch_size , args.sample_size, args.seed
+        train_path=train_path, test_path=test_path, batch_size=batch_size
     )
 
     model = create_model(args.model).to(device)
