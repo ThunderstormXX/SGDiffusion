@@ -290,3 +290,167 @@ class SimpleModel(nn.Module):
     def forward(self, x):
         x = self.linear(x)
         return torch.sigmoid(x)
+
+
+class CausalSelfAttention(nn.Module):
+    """Simplified causal self-attention for NanoGPT"""
+    
+    def __init__(self, n_embd, n_head, block_size):
+        super().__init__()
+        assert n_embd % n_head == 0
+        
+        self.n_head = n_head
+        self.n_embd = n_embd
+        self.head_dim = n_embd // n_head
+        
+        # Key, Query, Value projections
+        self.c_attn = nn.Linear(n_embd, 3 * n_embd, bias=False)
+        # Output projection
+        self.c_proj = nn.Linear(n_embd, n_embd, bias=False)
+        
+        # Causal mask
+        self.register_buffer("bias", torch.tril(torch.ones(block_size, block_size))
+                                     .view(1, 1, block_size, block_size))
+        
+    def forward(self, x):
+        B, T, C = x.size()  # batch size, sequence length, embedding dimensionality
+        
+        # Calculate query, key, values for all heads in batch and move head forward to be the batch dim
+        q, k, v = self.c_attn(x).split(self.n_embd, dim=2)
+        k = k.view(B, T, self.n_head, self.head_dim).transpose(1, 2)  # (B, nh, T, hs)
+        q = q.view(B, T, self.n_head, self.head_dim).transpose(1, 2)  # (B, nh, T, hs)
+        v = v.view(B, T, self.n_head, self.head_dim).transpose(1, 2)  # (B, nh, T, hs)
+        
+        # Causal self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
+        att = (q @ k.transpose(-2, -1)) * (1.0 / torch.sqrt(torch.tensor(k.size(-1))))
+        att = att.masked_fill(self.bias[:,:,:T,:T] == 0, float('-inf'))
+        att = F.softmax(att, dim=-1)
+        y = att @ v  # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
+        y = y.transpose(1, 2).contiguous().view(B, T, C)  # re-assemble all head outputs side by side
+        
+        # Output projection
+        y = self.c_proj(y)
+        return y
+
+
+class TransformerMLP(nn.Module):
+    """Simple MLP for transformer block"""
+    
+    def __init__(self, n_embd, mlp_ratio=4):
+        super().__init__()
+        hidden_dim = int(mlp_ratio * n_embd)
+        self.c_fc = nn.Linear(n_embd, hidden_dim, bias=False)
+        self.gelu = nn.GELU()
+        self.c_proj = nn.Linear(hidden_dim, n_embd, bias=False)
+        
+    def forward(self, x):
+        x = self.c_fc(x)
+        x = self.gelu(x)
+        x = self.c_proj(x)
+        return x
+
+
+class Block(nn.Module):
+    """Transformer block"""
+    
+    def __init__(self, n_embd, n_head, block_size, mlp_ratio=4):
+        super().__init__()
+        self.ln_1 = nn.LayerNorm(n_embd)
+        self.attn = CausalSelfAttention(n_embd, n_head, block_size)
+        self.ln_2 = nn.LayerNorm(n_embd)
+        self.mlp = TransformerMLP(n_embd, mlp_ratio)
+        
+    def forward(self, x):
+        x = x + self.attn(self.ln_1(x))
+        x = x + self.mlp(self.ln_2(x))
+        return x
+
+
+class NanoGPT(nn.Module):
+    """
+    Simplified GPT model for experiments
+    Target ~1000 parameters with:
+    n_layer=1, n_head=1, n_embd=8, vocab_size=25, block_size=16, mlp_ratio=1
+    """
+    
+    def __init__(self, vocab_size=25, n_embd=8, n_head=1, n_layer=1, 
+                 block_size=16, mlp_ratio=1):
+        super().__init__()
+        
+        self.vocab_size = vocab_size
+        self.n_embd = n_embd
+        self.n_head = n_head
+        self.n_layer = n_layer
+        self.block_size = block_size
+        
+        # Token and position embeddings
+        self.wte = nn.Embedding(vocab_size, n_embd)  # token embeddings
+        self.wpe = nn.Embedding(block_size, n_embd)  # position embeddings
+        
+        # Transformer blocks
+        self.blocks = nn.ModuleList([
+            Block(n_embd, n_head, block_size, mlp_ratio) 
+            for _ in range(n_layer)
+        ])
+        
+        # Final layer norm and language modeling head
+        self.ln_f = nn.LayerNorm(n_embd)
+        self.lm_head = nn.Linear(n_embd, vocab_size, bias=False)
+        
+        # Initialize weights
+        self.apply(self._init_weights)
+        
+    def _init_weights(self, module):
+        if isinstance(module, nn.Linear):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            if module.bias is not None:
+                torch.nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Embedding):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            
+    def get_num_params(self):
+        """Return the number of parameters in the model"""
+        return sum(p.numel() for p in self.parameters())
+        
+    def forward(self, idx, targets=None):
+        device = idx.device
+        b, t = idx.size()
+        assert t <= self.block_size, f"Cannot forward sequence of length {t}, block size is only {self.block_size}"
+        
+        # Token and position embeddings
+        pos = torch.arange(0, t, dtype=torch.long, device=device)  # shape (t)
+        tok_emb = self.wte(idx)  # token embeddings of shape (b, t, n_embd)
+        pos_emb = self.wpe(pos)  # position embeddings of shape (t, n_embd)
+        x = tok_emb + pos_emb
+        
+        # Forward through transformer blocks
+        for block in self.blocks:
+            x = block(x)
+            
+        # Final layer norm and projection to vocab
+        x = self.ln_f(x)
+        logits = self.lm_head(x)  # (b, t, vocab_size)
+        
+        loss = None
+        if targets is not None:
+            # Flatten for cross entropy loss
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+            
+        return logits, loss
+    
+    @torch.no_grad()
+    def generate(self, idx, max_new_tokens, temperature=1.0):
+        """Generate new tokens"""
+        for _ in range(max_new_tokens):
+            # Crop idx to the last block_size tokens
+            idx_cond = idx if idx.size(1) <= self.block_size else idx[:, -self.block_size:]
+            # Forward pass
+            logits, _ = self(idx_cond)
+            # Focus only on the last time step
+            logits = logits[:, -1, :] / temperature
+            # Sample from the distribution
+            probs = F.softmax(logits, dim=-1)
+            idx_next = torch.multinomial(probs, num_samples=1)
+            # Append sampled index to the running sequence
+            idx = torch.cat((idx, idx_next), dim=1)
+        return idx

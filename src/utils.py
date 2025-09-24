@@ -435,3 +435,37 @@ def load_saved_data(train_path: str, test_path: str, batch_size: int, shuffle_tr
     test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False)
 
     return train_ds, test_ds, train_loader, test_loader
+
+
+def load_shakespeare_data(train_path, val_path, batch_size, replacement=False, seed=42):
+    """Load Shakespeare dataset with optional replacement sampling"""
+    X_train, Y_train = torch.load(train_path)
+    X_val, Y_val = torch.load(val_path)
+    
+    train_dataset = TensorDataset(X_train, Y_train)
+    val_dataset = TensorDataset(X_val, Y_val)
+    
+    if replacement:
+        N = len(train_dataset)
+        eff = (N // batch_size) * batch_size  # multiple of batch_size
+        if eff != N:
+            raise Exception('Выборка кратна должна быть батчу иначе не сойдется с GD')
+        
+        g = torch.Generator().manual_seed(seed)
+        sampler = RandomSampler(train_dataset, replacement=True, num_samples=eff, generator=g)
+        batch_sampler = BatchSampler(sampler, batch_size=batch_size, drop_last=True)
+        
+        train_loader = DataLoader(
+            train_dataset,
+            batch_sampler=batch_sampler,
+            worker_init_fn=seed_worker, 
+            num_workers=0
+        )
+    else:
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,
+                                 worker_init_fn=seed_worker, num_workers=0)
+    
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False,
+                           worker_init_fn=seed_worker, num_workers=0)
+    
+    return train_dataset, val_dataset, train_loader, val_loader
