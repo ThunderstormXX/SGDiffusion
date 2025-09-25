@@ -1,32 +1,31 @@
-## Описание
-Этот проект посвящён исследованию методов оптимизации нейросетей. В ходе работы проводятся эксперименты с различными оптимизаторами, анализируются траектории обучения и влияние стохастического шума на процесс оптимизации. Особое внимание уделяется поведению моделей на разных этапах обучения и оценке стабильности их обновлений.
+Отлично 👌 Дополнил README с указанием, что запускать можно через `src/scripts/exp2/bash/run_full_setup.sh`. Вот финальная версия:
 
-## Установка и запуск
-### 1. Установка зависимостей
-Убедитесь, что у вас установлен Python 3.9+ и выполните:
-```bash
-pip install uv
-uv venv
-uv sync
-source .venv/bin/activate
-```
+# Neural Network Optimization Experiments
 
-### 2. Запуск экспериментов
-Примеры запуска скриптов:
-```bash
-python scripts/run.py
-python scripts/train_CNN_CIFAR.py
-```
+## Description
 
-## Results:
-1) Не получается найти батч, на котором модель шумит нещадно (хоть чуть чуть но учится, даже на батче 60000) 
+We evaluate our theoretical framework through controlled experiments in computer vision and natural language processing. Models are first trained with SGD and then refined with GD to reach local minima. Along SGD trajectories, we compute Hessians and project dynamics into the eigenbasis to measure dispersion across curvature directions. These experiments reveal (i) variance saturation in sharp directions (inverse Einstein relation), (ii) indefinite diffusion in flat directions, and (iii) robustness of these effects across architectures and datasets.
 
-## Todo (experiments):
-1) SGD с 3 сетапами: Дефолтный сетап с batch_size uniform sampling, кластеризация на batch_size кластеров датасета и либо заполнять батч элементами из разных кластеров, либо наоборот сэмплить один кластер и выбирать из него batch_size элементов
-2) Вывести стох градиенты по выборке с маленьким батчом, сделать визуализацию в ipynb с MDS 
-3) Лиенйый слой 2 компоненты, 4 веса, вывести инвариантное расрпеделние, корелляции по траеткории в каждой точке , 2 гаусианы , подсчет альф 
+The **main experiments** are located in:
 
-### TODO:
-1) Добавить конфиги для автоматизации экспериментов
-2) Сделать автоматическое логгирование ( пока что в ручную приходится прописывать путь для соранения)
+* `src/scripts/exp1/`
+* `src/scripts/exp2/`
 
+---
+
+## Installation and Setup
+
+### 1. Dependencies
+
+Make sure you have Python 3.9+ installed, then run:
+
+* `pip install uv`
+* `uv venv`
+* `uv sync`
+* `source .venv/bin/activate`
+
+### 2. Running Experiments
+
+You can run experiments with:
+
+* `bash src/scripts/exp{i}/bash/run_full_setup.sh`
