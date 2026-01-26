@@ -1,0 +1,127 @@
+{
+  "run_dir": "src/scripts/exp5/exp_results/setup1",
+  "seed": 42,
+  "device": "cpu",
+  "dtype": "float32",
+  "data": {
+    "name": "shakespeare",
+    "kwargs": {
+      "batch_size": 32,
+      "replacement": false,
+      "train_path": "src/data/shakespeare_train.pt",
+      "val_path": "src/data/shakespeare_val.pt",
+      "meta_path": "src/data/shakespeare_meta.pt"
+    }
+  },
+  "model": {
+    "name": "nanogpt",
+    "kwargs": {
+      "n_embd": 8,
+      "n_head": 1,
+      "n_layer": 1,
+      "mlp_ratio": 1,
+      "meta_path": "src/data/shakespeare_meta.pt"
+    }
+  },
+  "stages": [
+    {
+      "name": "stage1_sgd",
+      "mode": "steps",
+      "steps": 200,
+      "epochs": null,
+      "optimizer": {
+        "name": "sgd",
+        "kwargs": {
+          "lr": 0.01
+        }
+      },
+      "dataloader_mode": "minibatch",
+      "batch_size": null,
+      "trackers": [
+        {
+          "name": "metrics",
+          "kwargs": {
+            "every": 1
+          }
+        },
+        {
+          "name": "weights",
+          "kwargs": {
+            "every": 10
+          }
+        }
+      ],
+      "eval_every": 50,
+      "load_checkpoint": null,
+      "save_checkpoint": "stage1_sgd.pt"
+    },
+    {
+      "name": "stage2_gd",
+      "mode": "epochs",
+      "steps": null,
+      "epochs": 50,
+      "optimizer": {
+        "name": "sgd",
+        "kwargs": {
+          "lr": 0.001
+        }
+      },
+      "dataloader_mode": "fullbatch",
+      "batch_size": null,
+      "trackers": [
+        {
+          "name": "metrics",
+          "kwargs": {
+            "every": 1
+          }
+        },
+        {
+          "name": "grads",
+          "kwargs": {
+            "every": 10
+          }
+        }
+      ],
+      "eval_every": 10,
+      "load_checkpoint": null,
+      "save_checkpoint": "stage2_gd.pt"
+    },
+    {
+      "name": "stage3_sgd",
+      "mode": "steps",
+      "steps": 200,
+      "epochs": null,
+      "optimizer": {
+        "name": "sgd",
+        "kwargs": {
+          "lr": 0.01
+        }
+      },
+      "dataloader_mode": "minibatch",
+      "batch_size": null,
+      "trackers": [
+        {
+          "name": "metrics",
+          "kwargs": {
+            "every": 1
+          }
+        },
+        {
+          "name": "weights",
+          "kwargs": {
+            "every": 10
+          }
+        },
+        {
+          "name": "grads",
+          "kwargs": {
+            "every": 10
+          }
+        }
+      ],
+      "eval_every": 50,
+      "load_checkpoint": null,
+      "save_checkpoint": "stage3_sgd.pt"
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "run_dir": "src/scripts/exp5/exp_results/mnist_small",
+  "seed": 44,
+  "device": "cpu",
+  "dtype": "float32",
+  "data": {
+    "name": "mnist",
+    "kwargs": {
+      "batch_size": 64,
+      "replacement": true,
+      "sample_size": 6400
+    }
+  },
+  "model": {
+    "name": "class",
+    "kwargs": {
+      "class_name": "FlexibleMLP",
+      "hidden_dim": 8,
+      "num_hidden_layers": 1,
+      "input_downsample": 6
+    }
+  },
+  "stages": [
+    {
+      "name": "stage1_sgd",
+      "mode": "steps",
+      "steps": 100,
+      "epochs": null,
+      "optimizer": {
+        "name": "sgd",
+        "kwargs": {
+          "lr": 0.1
+        }
+      },
+      "dataloader_mode": "minibatch",
+      "batch_size": null,
+      "trackers": [
+        {
+          "name": "metrics",
+          "kwargs": {
+            "every": 1
+          }
+        },
+        {
+          "name": "weights",
+          "kwargs": {
+            "every": 5
+          }
+        }
+      ],
+      "eval_every": 20,
+      "load_checkpoint": null,
+      "save_checkpoint": "stage1_sgd.pt"
+    },
+    {
+      "name": "stage2_gd",
+      "mode": "epochs",
+      "steps": null,
+      "epochs": 10,
+      "optimizer": {
+        "name": "sgd",
+        "kwargs": {
+          "lr": 0.01
+        }
+      },
+      "dataloader_mode": "fullbatch",
+      "batch_size": null,
+      "trackers": [
+        {
+          "name": "metrics",
+          "kwargs": {
+            "every": 1
+          }
+        },
+        {
+          "name": "weights",
+          "kwargs": {
+            "every": 1
+          }
+        }
+      ],
+      "eval_every": 5,
+      "load_checkpoint": null,
+      "save_checkpoint": "stage2_gd.pt"
+    },
+    {
+      "name": "stage3_sgd",
+      "mode": "steps",
+      "steps": 1000,
+      "epochs": null,
+      "optimizer": {
+        "name": "sgd",
+        "kwargs": {
+          "lr": 0.1
+        }
+      },
+      "dataloader_mode": "minibatch",
+      "batch_size": null,
+      "trackers": [
+        {
+          "name": "metrics",
+          "kwargs": {
+            "every": 1
+          }
+        },
+        {
+          "name": "weights",
+          "kwargs": {
+            "every": 50
+          }
+        },
+        {
+          "name": "hessian",
+          "kwargs": {
+            "every": 200
+          }
+        }
+      ],
+      "eval_every": 100,
+      "load_checkpoint": null,
+      "save_checkpoint": "stage3_sgd.pt"
+    }
+  ]
+}

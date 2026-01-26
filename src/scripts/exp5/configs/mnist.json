@@ -1,0 +1,41 @@
+{
+    "description": "MNIST tunnel experiment configuration (SGD -> GD -> SGD)",
+    "dataset": "mnist",
+    "model": "FlexibleMLP",
+    "tracking_strategy": {
+        "stage1_sgd": ["weights"],
+        "stage2_gd": ["metrics"],
+        "stage3_sgd": ["weights", "hessians"]
+    },
+    "sizes": {
+        "small": {
+            "n_runs": 5,
+            "stage1_sgd_steps": 100,
+            "stage2_gd_epochs": 10,
+            "stage3_sgd_steps": 1000
+        },
+        "medium": {
+            "n_runs": 20,
+            "stage1_sgd_steps": 1000,
+            "stage2_gd_epochs": 100,
+            "stage3_sgd_steps": 1000
+        },
+        "large": {
+            "n_runs": 1000,
+            "stage1_sgd_steps": 1000,
+            "stage2_gd_epochs": 100,
+            "stage3_sgd_steps": 3000
+        }
+    },
+    "hyperparameters": {
+        "batch_size": 64,
+        "replacement": true,
+        "sgd_lr": 0.1,
+        "gd_lr": 0.01,
+        "hidden_dim": 8,
+        "input_downsample": 6,
+        "num_hidden_layers": 1,
+        "sample_size": 6400,
+        "note": "FlexibleMLP(hidden_dim=8, num_hidden_layers=1, input_downsample=6) -> 386 params"
+    }
+}

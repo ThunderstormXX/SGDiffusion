@@ -1,0 +1,11 @@
+Tensor: weights_stage1_sgd.pt
+==================================================
+Shape: (5, 21, 386)
+Description: (n_runs, n_steps, n_params)
+  n_runs:   5
+  n_steps:  21
+  n_params: 386
+Dtype: torch.float32
+Stage: stage1_sgd
+Valid runs: 5
+Created: 2026-01-26T23:52:22.553386
