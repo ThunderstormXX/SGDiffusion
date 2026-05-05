@@ -7,15 +7,15 @@ Usage:
     python -m src.scripts.exp5.visualize --run_dir src/scripts/exp5/exp_results/setup1 --summary
 """
 
-import sys
 import argparse
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.datamodelopt.visualization import VisualizationRunner, ManyRunsVisualizer
+from src.datamodelopt.visualization import ManyRunsVisualizer, VisualizationRunner
 
 
 def main():
@@ -32,12 +32,12 @@ Examples:
 
     # Plot specific stage
     python -m src.scripts.exp5.visualize --run_dir src/scripts/exp5/exp_results/setup1 --stage stage1_sgd
-    
+
     # Skip weight percentile plots
     python -m src.scripts.exp5.visualize --run_dir src/scripts/exp5/exp_results/setup1 --no-percentiles
         """
     )
-    
+
     parser.add_argument(
         "--run_dir",
         type=str,
@@ -72,11 +72,11 @@ Examples:
         default=[0, 20, 40, 60, 80],
         help="Percentiles for weight trajectory plots (default: 0 20 40 60 80)",
     )
-    
+
     args = parser.parse_args()
-    
+
     runner = VisualizationRunner(args.run_dir)
-    
+
     if args.summary:
         runner.print_summary()
     elif args.combined_only:
@@ -86,7 +86,7 @@ Examples:
         runner.plot_weight_trajectory(args.stage)
     else:
         runner.plot_all()
-        
+
         # Also generate weight percentile trajectory plots (single run version)
         if not args.no_percentiles and runner.stages:
             print("\n--- Weight Percentile Trajectories ---")

@@ -1,0 +1,12 @@
+{
+  "centered_loglog_slope": 2.0000000000000018,
+  "centered_prediction_relative_error": 0.015873015873015917,
+  "dim": 386,
+  "mean_grad_norm": 0.05486754246595449,
+  "mode": "mlp386",
+  "n_runs": 64,
+  "pass": true,
+  "raw_loglog_slope": 2.000000000000002,
+  "raw_over_centered_ratio_at_max_eta": 1.2031710649168759,
+  "raw_prediction_relative_error": 0.016722762670235244
+}

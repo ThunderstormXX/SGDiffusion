@@ -1,0 +1,30 @@
+experiment_id: EXP2
+result_name: exp2_eq32_smoke
+name: Parameter-free Eq. 32 validation smoke
+description: Small MLP-386 covariance prediction using independently estimated Hessian and gradient-noise statistics.
+seed: 44
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 128
+  val_size: 128
+  subset: first
+  normalize: false
+training:
+  batch_size: 32
+  replacement: true
+  lr: 0.05
+  reference_steps: 8
+ensemble:
+  n_runs: 5
+  steps: 40
+  lr: 0.03
+  methods: [sgd_replacement]
+analysis:
+  n_directions: 6
+  gradient_batches: 6
+  hessian_noise_batches: 3
+  gamma_seeds: [44, 144, 244]

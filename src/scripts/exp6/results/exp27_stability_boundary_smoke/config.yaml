@@ -1,0 +1,23 @@
+experiment_id: EXP27
+result_name: exp27_stability_boundary_smoke
+name: EXP27 stability boundary smoke
+description: Smoke phase diagram for discrete SGD vs standard Langevin stability.
+seed: 42
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  etas:
+  - 0.2
+  - 0.4
+  - 0.8
+  gammas:
+  - 1.0
+  - 2.0
+  - 2.4
+  - 4.0
+  lambda: 1.0
+  d: 0.2
+  num_steps: 300
+  n_runs: 8000
+  unstable_variance_threshold: 20.0

@@ -1,0 +1,8 @@
+{
+  "centered_large_batch_ratio_to_b1": 0.0009748562768758786,
+  "large_batch_raw_over_deterministic_floor": 1.0000374949684594,
+  "mean_grad_norm": 7.99481786250137,
+  "mode": "toy",
+  "pass": true,
+  "raw_large_batch_ratio_to_b1": 0.9621122666749982
+}

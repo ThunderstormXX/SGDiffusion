@@ -1,3 +1,26 @@
 data/
 
 src/scripts/*/exp_results/*/*.pt
+
+# OS / Python cache files
+.DS_Store
+**/.DS_Store
+__pycache__/
+**/__pycache__/
+*.py[cod]
+
+# Local virtual environments
+.venv/
+
+# Generated checkpoints and large tensor artifacts
+*.pt
+*.pth
+*.ckpt
+*.pkl
+*.pickle
+src/scripts/exp2/exp_results/**/sgd_logs_*.json
+
+# exp6 generated heavy raw arrays; configs, metrics, CSVs and figures are tracked separately
+src/scripts/exp6/results/**/raw_outputs.npz
+src/scripts/exp6/results/**/*_samples.npz
+src/scripts/exp6/results/**/environment.json

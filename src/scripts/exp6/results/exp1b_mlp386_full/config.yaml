@@ -1,0 +1,40 @@
+experiment_id: EXP1B
+result_name: exp1b_mlp386_full
+name: MLP-386 real-model falsification
+description: MLP-386 ensemble from a fixed pre-minimum point; full run is still modest
+  but slower than smoke.
+seed: 43
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 6400
+  val_size: 1000
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 100
+ensemble:
+  n_runs: 48
+  steps: 500
+  lr: 0.05
+  lr_grid:
+  - 0.0125
+  - 0.05
+  - 0.2
+  langevin_substeps: 8
+  langevin_coefficient_update_every: 8
+  langevin_drift_mode: reference
+  langevin_noise_mode: reference
+  langevin_noise_batches: 8
+  methods:
+  - sgd_replacement
+  - standard_langevin
+  - modified_langevin
+analysis:
+  n_directions: 16

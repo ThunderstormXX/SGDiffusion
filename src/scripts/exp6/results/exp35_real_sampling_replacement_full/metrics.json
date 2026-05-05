@@ -1,0 +1,9 @@
+{
+  "final_trace_with_replacement": 0.0006460768894018354,
+  "final_trace_without_replacement": 2.9293820768496493e-07,
+  "model": "MLP-386",
+  "n_runs": 8,
+  "num_steps": 48,
+  "pass": true,
+  "without_over_with_trace_final": 0.00045341075108905256
+}

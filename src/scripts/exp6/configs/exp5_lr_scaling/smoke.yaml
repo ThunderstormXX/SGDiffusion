@@ -1,0 +1,30 @@
+experiment_id: EXP5
+result_name: exp5_lr_scaling_smoke
+name: Learning-rate scaling of flat/sharp variance smoke
+description: Smoke test for real-model learning-rate scaling of projected variance in flat and sharp Hessian eigenspaces.
+seed: 57
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 128
+  val_size: 128
+  subset: first
+  normalize: false
+training:
+  batch_size: 32
+  replacement: true
+  lr: 0.05
+  reference_steps: 8
+ensemble:
+  n_runs: 4
+  steps: 50
+  lr: 0.03
+  lr_grid: [0.01, 0.03, 0.09]
+analysis:
+  mode: lr_scaling
+  eval_every: 10
+  n_flat_directions: 3
+  n_sharp_directions: 3

@@ -7,9 +7,8 @@ Usage:
     python -m src.scripts.exp5.run_pipeline --config path/to/config.json --device cuda
 """
 
-import os
-import sys
 import argparse
+import sys
 from pathlib import Path
 
 # Add project root to path
@@ -17,8 +16,8 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.datamodelopt.experiments.pipeline import ExperimentRunner
 from src.datamodelopt.core.config import ExperimentConfig
+from src.datamodelopt.experiments.pipeline import ExperimentRunner
 
 
 def main():
@@ -37,7 +36,7 @@ Examples:
     python -m src.scripts.exp5.run_pipeline --preset setup1 --run_dir ./my_results --seed 123
         """
     )
-    
+
     parser.add_argument(
         "--run_dir",
         type=str,
@@ -83,13 +82,13 @@ Examples:
         action="store_true",
         help="Disable progress bars",
     )
-    
+
     args = parser.parse_args()
-    
+
     # Must specify either config or preset
     if args.config is None and args.preset is None:
         parser.error("Must specify either --config or --preset")
-    
+
     # Load config
     if args.config is not None:
         print(f"Loading config from: {args.config}")
@@ -98,7 +97,7 @@ Examples:
         print(f"Loading preset: {args.preset}")
         from src.scripts.exp5.presets import get_preset
         config = get_preset(args.preset)
-    
+
     # Override config with command line arguments
     if args.run_dir is not None:
         config.run_dir = args.run_dir
@@ -108,7 +107,7 @@ Examples:
         config.device = args.device
     if args.dtype is not None:
         config.dtype = args.dtype
-    
+
     # Create and run experiment
     runner = ExperimentRunner(config)
     runner.run(progress=not args.no_progress)

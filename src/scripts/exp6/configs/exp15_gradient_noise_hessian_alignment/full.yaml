@@ -1,0 +1,12 @@
+experiment_id: EXP15
+result_name: exp15_gradient_noise_hessian_alignment_full
+name: Gradient-noise Hessian alignment
+description: Diagnostic for Var(G_i) versus Hessian eigenvalue using full MLP EXP2 artifacts.
+seed: 57
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+analysis:
+  source_result_dir: src/scripts/exp6/results/exp2_eq32_full
+  positive_lambda_min: 1.0e-8
+

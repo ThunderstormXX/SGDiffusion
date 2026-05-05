@@ -1,0 +1,17 @@
+experiment_id: EXP36
+result_name: exp36_real_learning_rate_scaling_smoke
+name: EXP36 real learning-rate scaling smoke
+description: Real MLP386 eta-scaling of raw and centered minibatch-gradient update moments.
+seed: 42
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset: {name: mnist, sample_size: 512, val_size: 128, subset: first, normalize: false}
+training: {batch_size: 64, replacement: true, lr: 0.1, reference_steps: 10}
+parameters:
+  mode: mlp386
+  batch_size: 64
+  n_batches: 16
+  n_runs: 16
+  etas: [0.01, 0.03, 0.1, 0.2]
+

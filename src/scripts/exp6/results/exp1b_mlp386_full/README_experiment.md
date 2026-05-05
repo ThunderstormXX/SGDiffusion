@@ -1,0 +1,143 @@
+# EXP1B: MLP-386 real-model falsification
+
+MLP-386 ensemble from a fixed pre-minimum point; full run is still modest but slower than smoke.
+
+## Reproduce
+
+```bash
+bash /Users/igoreshka/Desktop/SGDiffusion/src/scripts/exp6/scripts/run_one.sh src/scripts/exp6/results/exp1b_mlp386_full/config.yaml
+```
+
+## Artifacts
+
+- `config.yaml`: exact configuration used for this run.
+- `environment.json`: Python, package, hardware, git metadata.
+- `runtime.json`: runtime and RSS memory snapshot.
+- `metrics.json`: machine-readable primary metrics.
+- `raw_outputs.npz`: raw trajectories/statistics.
+- `figure_data.csv`: plotted data with mean/std/95% CI when applicable.
+- `make_figure.py`: figure generation from saved artifacts only.
+
+## Primary Metrics
+
+```json
+{
+  "high_lr": 0.2,
+  "high_lr_modified_langevin_closer": true,
+  "high_lr_modified_langevin_error_ratio": 0.998325991282539,
+  "lr_0.0125_langevin_coefficient_update_every": 8,
+  "lr_0.0125_langevin_discretization": "Euler-Maruyama with M*dt=eta and noise scale sqrt(eta*dt)",
+  "lr_0.0125_langevin_drift_mode": "reference",
+  "lr_0.0125_langevin_dt": 0.0015625,
+  "lr_0.0125_langevin_noise_mode": "reference",
+  "lr_0.0125_langevin_noise_scale": 0.004419417382415923,
+  "lr_0.0125_langevin_substeps": 8,
+  "lr_0.0125_langevin_time_per_sgd_step": 0.0125,
+  "lr_0.0125_modified_closer_ratio": 0.9992753657689546,
+  "lr_0.0125_modified_langevin_final_loss_ci95_high": 2.23062644732118,
+  "lr_0.0125_modified_langevin_final_loss_ci95_low": 2.230332531967557,
+  "lr_0.0125_modified_langevin_final_loss_mean": 2.2304794896443685,
+  "lr_0.0125_modified_langevin_final_loss_std": 0.0005194656383668443,
+  "lr_0.0125_modified_langevin_final_mean_path_error_to_sgd": 0.03184211999177933,
+  "lr_0.0125_modified_langevin_final_variance": 6.634638339164667e-06,
+  "lr_0.0125_pass": true,
+  "lr_0.0125_reference_full_gradient_norm": 0.08302056044340134,
+  "lr_0.0125_relative_error_modified": 0.004501460453563292,
+  "lr_0.0125_relative_error_standard": 0.004504724731305032,
+  "lr_0.0125_relative_improvement": 0.0007246342310453993,
+  "lr_0.0125_sgd_replacement_final_loss_ci95_high": 2.221475632304596,
+  "lr_0.0125_sgd_replacement_final_loss_ci95_low": 2.2211901696973575,
+  "lr_0.0125_sgd_replacement_final_loss_mean": 2.221332901000977,
+  "lr_0.0125_sgd_replacement_final_loss_std": 0.0005045262646915231,
+  "lr_0.0125_sgd_replacement_final_mean_path_error_to_sgd": 0.0,
+  "lr_0.0125_sgd_replacement_final_variance": 2.511714683350874e-06,
+  "lr_0.0125_standard_langevin_final_loss_ci95_high": 2.230605682522672,
+  "lr_0.0125_standard_langevin_final_loss_ci95_low": 2.2303318683399587,
+  "lr_0.0125_standard_langevin_final_loss_mean": 2.2304687754313153,
+  "lr_0.0125_standard_langevin_final_loss_std": 0.00048393885335885656,
+  "lr_0.0125_standard_langevin_final_mean_path_error_to_sgd": 0.0317540317773819,
+  "lr_0.0125_standard_langevin_final_variance": 5.069063263363205e-06,
+  "lr_0.0125_wasserstein_modified_to_sgd": 0.004501460453563292,
+  "lr_0.0125_wasserstein_standard_to_sgd": 0.004504724731305032,
+  "lr_0.05_langevin_coefficient_update_every": 8,
+  "lr_0.05_langevin_discretization": "Euler-Maruyama with M*dt=eta and noise scale sqrt(eta*dt)",
+  "lr_0.05_langevin_drift_mode": "reference",
+  "lr_0.05_langevin_dt": 0.00625,
+  "lr_0.05_langevin_noise_mode": "reference",
+  "lr_0.05_langevin_noise_scale": 0.01767766952966369,
+  "lr_0.05_langevin_substeps": 8,
+  "lr_0.05_langevin_time_per_sgd_step": 0.05,
+  "lr_0.05_modified_closer_ratio": 0.9960835305558343,
+  "lr_0.05_modified_langevin_final_loss_ci95_high": 2.2064552102875314,
+  "lr_0.05_modified_langevin_final_loss_ci95_low": 2.20357629402562,
+  "lr_0.05_modified_langevin_final_loss_mean": 2.2050157521565756,
+  "lr_0.05_modified_langevin_final_loss_std": 0.005088193098334434,
+  "lr_0.05_modified_langevin_final_mean_path_error_to_sgd": 0.27756261825561523,
+  "lr_0.05_modified_langevin_final_variance": 8.75374098541215e-05,
+  "lr_0.05_pass": true,
+  "lr_0.05_reference_full_gradient_norm": 0.06680361181497574,
+  "lr_0.05_relative_error_modified": 0.04316089014294751,
+  "lr_0.05_relative_error_standard": 0.04333059308676942,
+  "lr_0.05_relative_improvement": 0.003916469444165707,
+  "lr_0.05_sgd_replacement_final_loss_ci95_high": 2.030037126701171,
+  "lr_0.05_sgd_replacement_final_loss_ci95_low": 2.0281167505571305,
+  "lr_0.05_sgd_replacement_final_loss_mean": 2.0290769386291507,
+  "lr_0.05_sgd_replacement_final_loss_std": 0.003394070460327391,
+  "lr_0.05_sgd_replacement_final_mean_path_error_to_sgd": 0.0,
+  "lr_0.05_sgd_replacement_final_variance": 2.2907935999683104e-05,
+  "lr_0.05_standard_langevin_final_loss_ci95_high": 2.2064459174943343,
+  "lr_0.05_standard_langevin_final_loss_ci95_low": 2.203671219143036,
+  "lr_0.05_standard_langevin_final_loss_mean": 2.205058568318685,
+  "lr_0.05_standard_langevin_final_loss_std": 0.0049039984899240064,
+  "lr_0.05_standard_langevin_final_mean_path_error_to_sgd": 0.2784026563167572,
+  "lr_0.05_standard_langevin_final_variance": 7.107846613507718e-05,
+  "lr_0.05_wasserstein_modified_to_sgd": 0.04316089014294751,
+  "lr_0.05_wasserstein_standard_to_sgd": 0.04333059308676942,
+  "lr_0.2_langevin_coefficient_update_every": 8,
+  "lr_0.2_langevin_discretization": "Euler-Maruyama with M*dt=eta and noise scale sqrt(eta*dt)",
+  "lr_0.2_langevin_drift_mode": "reference",
+  "lr_0.2_langevin_dt": 0.025,
+  "lr_0.2_langevin_noise_mode": "reference",
+  "lr_0.2_langevin_noise_scale": 0.07071067811865477,
+  "lr_0.2_langevin_substeps": 8,
+  "lr_0.2_langevin_time_per_sgd_step": 0.2,
+  "lr_0.2_modified_closer_ratio": 0.998325991282539,
+  "lr_0.2_modified_langevin_final_loss_ci95_high": 3.8074015223838797,
+  "lr_0.2_modified_langevin_final_loss_ci95_low": 3.7010979995073967,
+  "lr_0.2_modified_langevin_final_loss_mean": 3.7542497609456382,
+  "lr_0.2_modified_langevin_final_loss_std": 0.18788071698533582,
+  "lr_0.2_modified_langevin_final_mean_path_error_to_sgd": 1.1979647874832153,
+  "lr_0.2_modified_langevin_final_variance": 0.0014006159035488963,
+  "lr_0.2_pass": true,
+  "lr_0.2_reference_full_gradient_norm": 0.06680361181497574,
+  "lr_0.2_relative_error_modified": 0.10664553305832669,
+  "lr_0.2_relative_error_standard": 0.10682435796479695,
+  "lr_0.2_relative_improvement": 0.0016740087174610895,
+  "lr_0.2_sgd_replacement_final_loss_ci95_high": 0.9305368292948222,
+  "lr_0.2_sgd_replacement_final_loss_ci95_low": 0.9232389669596539,
+  "lr_0.2_sgd_replacement_final_loss_mean": 0.926887898127238,
+  "lr_0.2_sgd_replacement_final_loss_std": 0.0128982330113822,
+  "lr_0.2_sgd_replacement_final_mean_path_error_to_sgd": 0.0,
+  "lr_0.2_sgd_replacement_final_variance": 0.0005342745571397245,
+  "lr_0.2_standard_langevin_final_loss_ci95_high": 3.799768643959092,
+  "lr_0.2_standard_langevin_final_loss_ci95_low": 3.709232302085829,
+  "lr_0.2_standard_langevin_final_loss_mean": 3.7545004730224605,
+  "lr_0.2_standard_langevin_final_loss_std": 0.16001382046522258,
+  "lr_0.2_standard_langevin_final_mean_path_error_to_sgd": 1.2017230987548828,
+  "lr_0.2_standard_langevin_final_variance": 0.0011372712906450033,
+  "lr_0.2_wasserstein_modified_to_sgd": 0.10664553305832669,
+  "lr_0.2_wasserstein_standard_to_sgd": 0.10682435796479695,
+  "lr_grid": [
+    0.0125,
+    0.05,
+    0.2
+  ],
+  "modified_better_at_high_lr": true,
+  "modified_langevin_closer_fraction": 1.0,
+  "n_learning_rates": 3,
+  "pass": true,
+  "relative_error_modified": 0.10664553305832669,
+  "relative_error_standard": 0.10682435796479695,
+  "relative_improvement": 0.0016740087174610895
+}
+```

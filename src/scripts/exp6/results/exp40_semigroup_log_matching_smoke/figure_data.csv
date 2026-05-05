@@ -1,0 +1,5 @@
+eta,step,method,error
+0.06,0.06,standard_generator,1.7115424832544022
+0.06,0.06,corrected_generator,1.295375692765841
+0.1,0.1,standard_generator,2.795078160916525
+0.1,0.1,corrected_generator,1.0276272550459469

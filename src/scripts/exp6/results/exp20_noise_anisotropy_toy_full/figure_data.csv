@@ -1,0 +1,5 @@
+step,method,variance
+0,parallel_to_gradient_raw,0.05776463217538053
+0,orthogonal_raw_mean,0.0002253718399858702
+0,parallel_to_gradient_centered,0.00022524744449224543
+0,orthogonal_centered_mean,0.00022536883879140522

@@ -17,9 +17,9 @@ Usage:
         --output_dir src/scripts/exp5/exp_results/many_runs_analysis
 """
 
-import sys
 import argparse
 import glob
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
@@ -54,7 +54,7 @@ Examples:
         --percentiles 0 25 50 75 100
         """
     )
-    
+
     parser.add_argument(
         "--run_dirs",
         type=str,
@@ -98,9 +98,26 @@ Examples:
         action="store_true",
         help="Generate only comparison plot (normalized vs raw)",
     )
-    
+    parser.add_argument(
+        "--hessian-only",
+        action="store_true",
+        help="Generate only Hessian spectrum plot",
+    )
+    parser.add_argument(
+        "--n_left",
+        type=int,
+        default=20,
+        help="Number of leftmost eigenvalues to show (default: 20)",
+    )
+    parser.add_argument(
+        "--n_right",
+        type=int,
+        default=20,
+        help="Number of rightmost eigenvalues to show (default: 20)",
+    )
+
     args = parser.parse_args()
-    
+
     # Get run directories
     if args.run_dirs:
         run_dirs = args.run_dirs
@@ -111,26 +128,28 @@ Examples:
             return
     else:
         parser.error("Must specify either --run_dirs or --pattern")
-    
+
     print(f"Found {len(run_dirs)} run directories:")
     for d in run_dirs:
         print(f"  - {d}")
-    
+
     if len(run_dirs) < 2:
         print("\nWarning: Only 1 run directory found. Many runs analysis works best with multiple runs.")
-    
+
     # Create visualizer
     viz = ManyRunsVisualizer(
         run_dirs=run_dirs,
         stages=args.stages,
         output_dir=args.output_dir,
     )
-    
+
     # Generate plots
     if args.combined_only:
         viz.plot_weight_trajectories_combined(percentiles=args.percentiles)
     elif args.comparison_only:
         viz.plot_weight_trajectories_comparison(percentiles=args.percentiles)
+    elif args.hessian_only:
+        viz.plot_hessian_spectrum(n_left=args.n_left, n_right=args.n_right)
     else:
         viz.plot_all()
 

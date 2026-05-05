@@ -1,0 +1,31 @@
+experiment_id: EXP14
+result_name: exp14_eta_batch_scaling_smoke
+name: Eta and batch-size scaling smoke
+description: Smoke test for flat/sharp variance scaling across learning rates and batch sizes.
+seed: 56
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 256
+  val_size: 256
+  subset: first
+  normalize: false
+training:
+  batch_size: 32
+  replacement: true
+  lr: 0.05
+  reference_steps: 8
+ensemble:
+  n_runs: 3
+  steps: 30
+  lr: 0.03
+  lr_grid: [0.015, 0.03, 0.06]
+  batch_grid: [16, 32]
+analysis:
+  n_flat_directions: 3
+  n_sharp_directions: 3
+  eval_every: 5
+

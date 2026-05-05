@@ -1,0 +1,35 @@
+experiment_id: EXP9
+result_name: exp9_theory_denoised_sgd_full
+name: Theory-denoised SGD
+description: Prototype optimizer using full-gradient control variates to remove minibatch
+  noise in theory-predicted high-variance directions.
+seed: 51
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 1024
+  val_size: 512
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 50
+ensemble:
+  n_runs: 12
+  steps: 300
+  lr: 0.12
+  methods:
+  - baseline_sgd
+  - denoise_theory_high_variance
+  - denoise_random
+  - denoise_sharp
+analysis:
+  n_theory_directions: 6
+  n_sharp_directions: 6
+  gradient_batches: 8
+  eval_every: 50

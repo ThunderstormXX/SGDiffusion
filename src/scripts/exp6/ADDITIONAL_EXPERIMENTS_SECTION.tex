@@ -1,0 +1,257 @@
+\section{Additional Experiments}
+\label{sec:appendix_experiments}
+
+In this section, we provide additional experimental results supporting the main
+claims of the paper. The experiments are designed to test four aspects of the
+theory: (i) whether standard Langevin approximations reproduce discrete SGD,
+(ii) whether the local covariance formula predicts the observed variance
+profile in the Hessian eigenbasis, (iii) whether flat and sharp directions
+exhibit distinct dynamical regimes, and (iv) whether the stochastic component
+of SGD can be causally controlled. Unless stated otherwise, all experiments use
+fixed random seeds, save the full configuration and raw intermediate artifacts,
+and generate figures directly from saved outputs.
+
+\subsection{Falsification of Langevin Approximations}
+
+We first compare discrete SGD with standard and modified Langevin
+approximations. The goal of these experiments is not merely to fit trajectories,
+but to test whether the qualitative behavior of the stochastic process is
+captured at finite learning rate. In the toy setting, the dynamics are chosen so
+that the standard Langevin approximation predicts a stationary variance in a
+regime where the exact discrete SGD recursion does not. This provides a direct
+counterexample to the view that SGD can always be faithfully represented as
+Brownian motion in a fixed potential.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp1a_toy_full.png}
+    \caption{Toy example showing qualitative discrepancies between SGD and Langevin dynamics.}
+    \label{fig:appendix_exp1a_toy}
+\end{figure}
+
+We then repeat the comparison on the MLP-386 MNIST model. All methods are
+initialized from the same reference point. For SGD, minibatches are sampled with
+replacement. For the Langevin baselines, the deterministic drift is given by the
+full-gradient direction, while the stochastic term is calibrated from minibatch
+gradient fluctuations. We sweep the learning rate and compare the ensemble
+variance, the mean trajectory, and the distance of the Langevin approximations
+from the SGD ensemble. At small learning rates the methods remain close, while
+finite learning rates produce systematic deviations from SGD. In the full run,
+the modified Langevin correction improves the behavior only in some regimes and
+does not uniformly recover the SGD dynamics, emphasizing that the discrete SGD
+description is not simply reducible to a corrected Brownian model.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp1b_mlp386_full.png}
+    \caption{Comparison of SGD, standard Langevin, and modified Langevin dynamics on a small neural network. Standard Langevin deviates from SGD at finite learning rates, while the modified Langevin correction does not consistently recover SGD behavior in the full setup.}
+    \label{fig:appendix_exp1b_mlp386}
+\end{figure}
+
+\subsection{Quantitative Validation of the Discrete Theory}
+
+We next test the local covariance prediction derived from the discrete
+Fokker--Planck analysis. Starting from a trained reference point, we compute the
+full Hessian of the empirical loss and rotate trajectories into the eigenbasis
+of the mean Hessian. The theoretical prediction is computed from independently
+estimated gradient-noise statistics and Hessian eigenvalues; it is not obtained
+by fitting the observed trajectory variance. We then compare the predicted and
+measured variances across eigendirections.
+
+The agreement is strongest in the leading eigendirections, where the local
+quadratic approximation is most informative. In the full run, the predicted and
+measured variance profiles have high log-correlation, and held-out checks show
+that the agreement is not explained by a single post-hoc rescaling. We also
+estimate the proportionality constant $\gamma$ across multiple sampler seeds and
+find it to be stable. Finally, we directly check the Hessian-noise structure in
+the mean-Hessian eigenbasis: the diagonal mass dominates the off-diagonal mass,
+supporting the approximate diagonality assumption used in the derivation.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp2_eq32_full.png}
+    \caption{Quantitative validation of the theoretical predictions. Predicted and measured variances across eigendirections show strong structural agreement.}
+    \label{fig:appendix_exp2_eq32}
+\end{figure}
+
+\subsection{Sampling Effects}
+
+Our theoretical master equation assumes sampling with replacement, so that
+minibatches are independent across steps. Standard epoch-based training often
+uses sampling without replacement, which introduces temporal correlations
+between updates. To assess the relevance of this distinction, we compare
+trajectory ensembles generated from the same reference point and optimizer
+hyperparameters under both sampling schemes. The experiment measures the
+resulting covariance and trajectory displacement in the same projection space.
+The results show that the sampling rule changes the stochastic dynamics,
+confirming that replacement sampling is not merely an implementation detail but
+part of the probabilistic model being tested.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp3_sampling_full.png}
+    \caption{Effect of sampling strategy on SGD dynamics.}
+    \label{fig:appendix_exp3_sampling}
+\end{figure}
+
+\subsection{Scaling Diagnostics}
+
+Exact dense Hessian computations are feasible only for small models. To probe
+whether the sharp--flat decomposition persists beyond the smallest setting, we
+include a lightweight scaling diagnostic based on Hessian-vector products and
+top-curvature directions. This experiment does not aim to reproduce the full
+dense-Hessian analysis at large scale. Instead, it checks whether a small number
+of high-curvature directions can still be identified and whether projected
+trajectory variance behaves differently along those directions compared with
+random low-curvature directions.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp4_scaling_full.png}
+    \caption{Scaling diagnostics across configurations.}
+    \label{fig:appendix_exp4_scaling}
+\end{figure}
+
+\subsection{Non-Stationarity and Learning-Rate Scaling}
+
+The theory predicts that near non-stationary points the mean trajectory drifts
+through a fluctuating local curvature field, producing additional sources of
+spreading. We therefore compare SGD trajectories starting from an early or
+mid-training reference point, where the full gradient is not zero. The measured
+trajectory spread is compared with stationary and non-stationary approximations.
+This experiment tests whether transient dynamics contain variance growth not
+explained by a stationary local model.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp5_nonstationary_full.png}
+    \caption{Non-stationary behavior of SGD: certain directions exhibit persistent spreading over time.}
+    \label{fig:appendix_exp5_nonstationary}
+\end{figure}
+
+We additionally sweep the learning rate and measure variance growth in two
+Hessian-defined buckets: nearly-flat directions and sharp directions. The
+important comparison is not whether sharp directions reach a mathematically
+perfect plateau in finite time, but whether their late-time growth is much
+weaker than the non-stationary spreading observed in flat or weakly-curved
+directions. The full run shows learning-rate dependence of the variance-growth
+statistics and effective confinement of the sharp directions, consistent with
+the predicted separation between diffusive and rigid modes.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp5_lr_scaling_full.png}
+    \caption{Learning-rate scaling of SGD dynamics. Flat directions exhibit slow diffusion with learning-rate dependence, while sharp directions remain effectively confined.}
+    \label{fig:appendix_exp5_lr_scaling}
+\end{figure}
+
+\subsection{Generalization and Geometry}
+
+We also test whether displacement along Hessian-defined subspaces is directly
+predictive of generalization. Starting from a common reference point, we run
+multiple SGD trajectories and measure their final displacement in flat and sharp
+eigenspaces, together with train loss, test loss, and generalization gap. This
+experiment is exploratory: its purpose is to determine whether the local
+diffusion picture immediately translates into a simple generalization predictor.
+The observed correlations are weak, suggesting that the theory primarily
+describes local stochastic dynamics rather than providing a standalone
+generalization law.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp6_generalization_full.png}
+    \caption{Relationship between diffusion and generalization.}
+    \label{fig:appendix_exp6_generalization}
+\end{figure}
+
+\subsection{Controlling Diffusion}
+
+To test whether the theoretically identified directions are causally relevant,
+we modify SGD updates by suppressing stochastic components in selected
+subspaces. The selected subspaces include flat directions, sharp directions, and
+directions predicted by the local theory to have high variance. Suppressing the
+noise in these directions reduces the corresponding projected variance, showing
+that the measured spread is not a plotting artifact but is directly controlled
+by the minibatch-noise component of the update.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp7_diffusion_control_full.png}
+    \caption{Suppressing diffusion in selected eigendirections constrains the dynamics.}
+    \label{fig:appendix_exp7_diffusion_control}
+\end{figure}
+
+Conversely, we amplify the stochastic component in selected directions. This
+experiment checks the opposite intervention: if the selected subspace is
+responsible for the observed diffusion, increasing the noise there should
+increase the trajectory spread. The resulting curves confirm that the variance
+can be increased in a targeted way, although this does not necessarily improve
+optimization or generalization.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp8_diffusion_amplification_full.png}
+    \caption{Amplifying diffusion in selected directions enhances stochastic spreading.}
+    \label{fig:appendix_exp8_diffusion_amplification}
+\end{figure}
+
+\subsection{Theory-Guided Denoising}
+
+As a further intervention, we construct a theory-guided denoised update. At each
+step, we decompose the minibatch gradient into the full-gradient component and
+the stochastic residual, then remove the residual component in selected
+eigendirections. This is not proposed as an efficient optimizer, since it uses
+full-gradient information, but it provides a controlled test of the theory. The
+experiment shows that removing noise in the predicted high-variance subspace
+substantially reduces projected variance while leaving the deterministic drift
+intact.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp9_theory_denoised_sgd_full.png}
+    \caption{Theory-guided denoising of SGD updates alters the dynamics in a predictable way.}
+    \label{fig:appendix_exp9_theory_denoised}
+\end{figure}
+
+\subsection{Causal Control of Noise via Alpha Interpolation}
+
+Finally, we introduce a direct interpolation between full-gradient descent and
+SGD. For each minibatch we compute
+\[
+g_{\mathrm{batch}} = g_{\mathrm{full}} + \xi,
+\]
+where $\xi$ is the minibatch-noise component. We then update using
+\[
+g_\alpha = g_{\mathrm{full}} + \alpha \xi .
+\]
+Thus $\alpha=0$ corresponds to deterministic full-gradient descent from the
+same reference point, while $\alpha=1$ recovers the SGD update. This experiment
+provides a causal test of the role of minibatch noise: increasing $\alpha$
+directly increases the ensemble variance of trajectories. In the raw-noise
+setting, intermediate noise levels can match or improve the final test loss
+relative to $\alpha=1$, indicating that the effect of stochasticity is
+quantitative and regime-dependent rather than universally beneficial.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp10_noise_alpha_sweep_full.png}
+    \caption{Alpha sweep controlling the magnitude of the stochastic component in SGD. Increasing $\alpha$ increases trajectory spread and ensemble variance.}
+    \label{fig:appendix_exp10_alpha}
+\end{figure}
+
+We also consider a normalized variant in which the noise vector is rescaled to
+match the norm of the full gradient before applying the coefficient $\alpha$.
+This isolates the effect of relative noise strength. The resulting trajectories
+show a particularly clear monotonic increase in ensemble variance as $\alpha$
+increases. In this setup, large normalized noise substantially increases
+trajectory spread and can degrade test performance, demonstrating that the
+stochastic component of SGD is a controllable driver of diffusion rather than an
+external Brownian forcing independent of the loss landscape.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/new_exps_igor/exp11_normalized_noise_alpha_sweep_full.png}
+    \caption{Normalized alpha sweep. Controlled stochasticity directly modulates trajectory variance and affects generalization behavior.}
+    \label{fig:appendix_exp11_alpha_normalized}
+\end{figure}
+

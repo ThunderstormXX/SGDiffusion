@@ -1,0 +1,37 @@
+experiment_id: EXP13
+result_name: exp13_langevin_falsification_modes_smoke
+name: Langevin falsification in Hessian modes smoke
+description: Smoke test for SGD vs standard/modified Langevin variance dynamics in
+  flat and sharp Hessian eigenspaces.
+seed: 55
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 256
+  val_size: 256
+  subset: first
+  normalize: false
+training:
+  batch_size: 32
+  replacement: true
+  lr: 0.05
+  reference_steps: 8
+ensemble:
+  n_runs: 4
+  steps: 40
+  lr: 0.03
+  langevin_noise_batches: 3
+  methods:
+  - sgd
+  - standard_langevin
+  - modified_langevin
+  - gd
+analysis:
+  n_flat_directions: 3
+  n_sharp_directions: 3
+  n_diffusive_directions: 3
+  gradient_batches: 4
+  eval_every: 4

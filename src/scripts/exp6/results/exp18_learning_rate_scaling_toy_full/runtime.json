@@ -1,0 +1,6 @@
+{
+  "rss_end_mb": 314.5625,
+  "rss_peak_note": "psutil RSS sampled at process end; not a true peak.",
+  "rss_start_mb": 265.25,
+  "runtime_seconds": 0.027742582955397666
+}

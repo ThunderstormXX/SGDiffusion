@@ -1,0 +1,76 @@
+{
+    "experiment_name": "mnist_manysgd_small",
+    "description": "MNIST Many-SGD Small: Quick test (1 SGD -> 1 GD -> 5 SGD)",
+    
+    "data": {
+        "name": "mnist",
+        "sample_size": 6400,
+        "replacement": true
+    },
+    
+    "model": {
+        "name": "class",
+        "class_name": "FlexibleMLP",
+        "hidden_dim": 8,
+        "num_hidden_layers": 1,
+        "input_downsample": 6
+    },
+    
+    "tunnels": [
+        {
+            "name": "tunnel_0",
+            "description": "SGD: 10000 steps, lr=0.1, batch=64",
+            "mode": "steps",
+            "steps": 10000,
+            "optimizer": "sgd",
+            "lr": 0.1,
+            "batch_size": 64,
+            "n_runs": 1,
+            "trackers": {
+                "metrics": {"every": 1},
+                "weights": {"every": 1}
+            },
+            "eval_every": 100,
+            "save_checkpoint": true,
+            "source_mode": null
+        },
+        {
+            "name": "tunnel_1",
+            "description": "GD: 10 epochs, lr=0.01, fullbatch",
+            "mode": "epochs",
+            "epochs": 10,
+            "optimizer": "sgd",
+            "lr": 0.01,
+            "batch_size": 6400,
+            "dataloader_mode": "fullbatch",
+            "n_runs": 1,
+            "trackers": {
+                "metrics": {"every": 1},
+                "weights": {"every": 1}
+            },
+            "eval_every": 1,
+            "save_checkpoint": true,
+            "source_mode": "1to1"
+        },
+        {
+            "name": "tunnel_2",
+            "description": "Many SGD: 1000 steps x 5 runs, lr=0.01",
+            "mode": "steps",
+            "steps": 1000,
+            "optimizer": "sgd",
+            "lr": 0.01,
+            "batch_size": 64,
+            "n_runs": 5,
+            "trackers": {
+                "metrics": {"every": 1},
+                "weights": {"every": 1}
+            },
+            "eval_every": 100,
+            "save_checkpoint": true,
+            "source_mode": "cartesian"
+        }
+    ],
+    
+    "device": "cpu",
+    "dtype": "float32"
+}

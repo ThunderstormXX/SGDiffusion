@@ -1,0 +1,18 @@
+experiment_id: EXP29
+result_name: exp29_nonstationary_drift_spreading_full
+name: EXP29 non-stationary drift spreading full
+description: Full test for eta^2 Gamma mu(t)^2 drift-induced variance source.
+seed: 42
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  num_steps: 900
+  n_runs: 50000
+  eta: 0.02
+  lambda_flat: 0.0
+  lambda_sharp: 1.0
+  gamma_flat: 0.8
+  gamma_sharp: 0.1
+  d: 0.02
+  gbar_flat: 0.5

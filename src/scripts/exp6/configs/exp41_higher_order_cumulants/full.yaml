@@ -1,0 +1,13 @@
+experiment_id: EXP41
+result_name: exp41_higher_order_cumulants_full
+name: EXP41 higher-order cumulant diagnostic full
+description: "Tests Pawula-style limitation: Gaussian corrected Langevin matches second-order structure but misses skew/kurtosis."
+seed: 46
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  n_samples: 200000
+  eta: 0.05
+  gbar: 1.0
+  sigma: 0.8

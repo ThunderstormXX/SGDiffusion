@@ -1,0 +1,60 @@
+# EXP6: Diffusion vs generalization smoke
+
+Small Hessian-eigenspace test correlating flat/sharp displacement with validation loss and generalization gap.
+
+## Reproduce
+
+```bash
+bash /Users/igoreshka/Desktop/SGDiffusion/src/scripts/exp6/scripts/run_one.sh src/scripts/exp6/results/exp6_generalization_smoke/config.yaml
+```
+
+## Artifacts
+
+- `config.yaml`: exact configuration used for this run.
+- `environment.json`: Python, package, hardware, git metadata.
+- `runtime.json`: runtime and RSS memory snapshot.
+- `metrics.json`: machine-readable primary metrics.
+- `raw_outputs.npz`: raw trajectories/statistics.
+- `figure_data.csv`: plotted data with mean/std/95% CI when applicable.
+- `make_figure.py`: figure generation from saved artifacts only.
+
+## Primary Metrics
+
+```json
+{
+  "final_test_loss_ci95_high": 2.3136588919571324,
+  "final_test_loss_ci95_low": 2.3114611517974453,
+  "final_test_loss_mean": 2.312560021877289,
+  "final_test_loss_std": 0.0015857520104091325,
+  "final_train_loss_ci95_high": 2.2780697208691243,
+  "final_train_loss_ci95_low": 2.2771753805827495,
+  "final_train_loss_mean": 2.277622550725937,
+  "final_train_loss_std": 0.0006453000828410024,
+  "flat_displacement_mean": 4.4218880557167495e-08,
+  "flat_eigenvalue_abs_max": 3.6304936921333075e-12,
+  "generalization_gap_ci95_high": 0.03596507415574338,
+  "generalization_gap_ci95_low": 0.033909868146960474,
+  "generalization_gap_mean": 0.03493747115135193,
+  "generalization_gap_std": 0.0014829082709650312,
+  "pass": true,
+  "pearson_flat_displacement_generalization_gap": 0.14951227296104388,
+  "pearson_flat_displacement_generalization_gap_pvalue": 0.7238142032865773,
+  "pearson_flat_displacement_test_loss": 0.05387531363739094,
+  "pearson_sharp_displacement_generalization_gap": 0.2234456500755886,
+  "pearson_total_displacement_generalization_gap": 0.06307154022025331,
+  "regression_gap_flat_coef": 24055.709737725792,
+  "regression_gap_intercept": -1.650639916887467,
+  "regression_gap_r2": 0.13108425279723268,
+  "regression_gap_sharp_coef": 0.061492157865974,
+  "regression_gap_train_loss_coef": 0.7363643881952247,
+  "sharp_displacement_mean": 0.11958492919802666,
+  "sharp_eigenvalue_max": 0.20440411567687988,
+  "sharp_eigenvalue_min": 0.1472964882850647,
+  "spearman_flat_displacement_generalization_gap": 0.14285714285714288,
+  "spearman_flat_displacement_generalization_gap_pvalue": 0.735764859879812,
+  "spearman_flat_displacement_test_loss": 0.023809523809523815,
+  "spearman_sharp_displacement_generalization_gap": 0.14285714285714288,
+  "spearman_total_displacement_generalization_gap": 0.261904761904762,
+  "total_displacement_mean": 0.20858491212129593
+}
+```

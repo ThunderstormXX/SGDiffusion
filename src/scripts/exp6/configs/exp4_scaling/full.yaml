@@ -1,0 +1,36 @@
+experiment_id: EXP4
+result_name: exp4_scaling_full
+name: Scaling experiment lite
+description: "Lightweight HVP scaling diagnostic: wider MLP, top Hessian-vector direction, random flat proxy directions, and SGD trajectory variance."
+seed: 46
+deterministic: true
+enabled: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 2048
+  val_size: 512
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.08
+  reference_steps: 300
+ensemble:
+  n_runs: 64
+  steps: 320
+  lr: 0.04
+  methods: [sgd_replacement]
+model:
+  preferred: mlp_lite
+  hidden_dim: 64
+  num_hidden_layers: 2
+  input_downsample: 8
+analysis:
+  hessian_method: hvp_power_iteration
+  power_iterations: 12
+  top_eigirections: 1
+  random_flat_directions: 8

@@ -1,0 +1,10 @@
+{
+  "empirical_kurtosis": 9.219502937023723,
+  "empirical_skewness": -2.027602887041882,
+  "eta": 0.05,
+  "gaussian_kurtosis": 3.0010796742390347,
+  "gaussian_skewness": 0.0009684323159862717,
+  "histogram_kl_empirical_to_gaussian": 0.48855976567268333,
+  "n_samples": 200000,
+  "pass": true
+}

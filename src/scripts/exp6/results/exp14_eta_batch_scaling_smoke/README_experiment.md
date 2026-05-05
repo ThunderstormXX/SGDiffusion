@@ -1,0 +1,63 @@
+# EXP14: Eta and batch-size scaling smoke
+
+Smoke test for flat/sharp variance scaling across learning rates and batch sizes.
+
+## Reproduce
+
+```bash
+bash /Users/igoreshka/Desktop/SGDiffusion/src/scripts/exp6/scripts/run_one.sh src/scripts/exp6/results/exp14_eta_batch_scaling_smoke/config.yaml
+```
+
+## Artifacts
+
+- `config.yaml`: exact configuration used for this run.
+- `environment.json`: Python, package, hardware, git metadata.
+- `runtime.json`: runtime and RSS memory snapshot.
+- `metrics.json`: machine-readable primary metrics.
+- `raw_outputs.npz`: raw trajectories/statistics.
+- `figure_data.csv`: plotted data with mean/std/95% CI when applicable.
+- `make_figure.py`: figure generation from saved artifacts only.
+
+## Primary Metrics
+
+```json
+{
+  "batch_grid": [
+    16,
+    32
+  ],
+  "flat_slope_lr_correlation": 0.9895751332533584,
+  "lr_0.015_batch_16_flat_late_mean_variance": 5.580657463921668e-13,
+  "lr_0.015_batch_16_flat_late_slope": 8.56969971873254e-14,
+  "lr_0.015_batch_16_sharp_late_mean_variance": 4.821391121367924e-05,
+  "lr_0.015_batch_16_sharp_late_slope": 1.6615147615084414e-06,
+  "lr_0.015_batch_32_flat_late_mean_variance": 4.728550992601221e-13,
+  "lr_0.015_batch_32_flat_late_slope": 2.879515473720034e-14,
+  "lr_0.015_batch_32_sharp_late_mean_variance": 1.2630554010684136e-05,
+  "lr_0.015_batch_32_sharp_late_slope": -1.1085447113146064e-06,
+  "lr_0.03_batch_16_flat_late_mean_variance": 2.234035656120681e-12,
+  "lr_0.03_batch_16_flat_late_slope": 3.442183983595052e-13,
+  "lr_0.03_batch_16_sharp_late_mean_variance": 0.0001820146426325664,
+  "lr_0.03_batch_16_sharp_late_slope": 5.907904414925719e-06,
+  "lr_0.03_batch_32_flat_late_mean_variance": 1.8946456816631985e-12,
+  "lr_0.03_batch_32_flat_late_slope": 1.1478081939769732e-13,
+  "lr_0.03_batch_32_sharp_late_mean_variance": 4.716238981927745e-05,
+  "lr_0.03_batch_32_sharp_late_slope": -4.4552187318913595e-06,
+  "lr_0.06_batch_16_flat_late_mean_variance": 9.031389351654706e-12,
+  "lr_0.06_batch_16_flat_late_slope": 1.3948129977403571e-12,
+  "lr_0.06_batch_16_sharp_late_mean_variance": 0.0006513696280308068,
+  "lr_0.06_batch_16_sharp_late_slope": 1.8760852981358773e-05,
+  "lr_0.06_batch_32_flat_late_mean_variance": 7.545145064291603e-12,
+  "lr_0.06_batch_32_flat_late_slope": 4.520697184651199e-13,
+  "lr_0.06_batch_32_sharp_late_mean_variance": 0.0001653909421293065,
+  "lr_0.06_batch_32_sharp_late_slope": -1.7747503443388253e-05,
+  "lr_grid": [
+    0.015,
+    0.03,
+    0.06
+  ],
+  "n_runs": 3,
+  "pass": true,
+  "steps": 30
+}
+```

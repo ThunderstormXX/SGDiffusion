@@ -1,0 +1,28 @@
+experiment_id: EXP5
+result_name: exp5_nonstationary_smoke
+name: Non-stationary regime validation smoke
+description: Early-point MLP-386 test comparing stationary and non-stationary Langevin-like approximations.
+seed: 47
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 256
+  val_size: 256
+  subset: first
+  normalize: false
+training:
+  batch_size: 32
+  replacement: true
+  lr: 0.05
+  reference_steps: 4
+ensemble:
+  n_runs: 6
+  steps: 80
+  lr: 0.03
+  langevin_noise_batches: 4
+  methods: [sgd_replacement, standard_langevin, modified_langevin]
+analysis:
+  n_directions: 6

@@ -1,0 +1,20 @@
+experiment_id: EXP38
+result_name: exp38_corrected_generator_distribution_smoke
+name: EXP38 corrected generator distribution matching smoke
+description: Smoke test for corrected generator moment matching over short nonlinear stochastic trajectories.
+seed: 43
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  dim: 4
+  eta: 0.1
+  num_steps: 12
+  n_runs: 4000
+  sigma: 0.4
+  eig_min: 0.4
+  eig_max: 1.6
+  cubic: 0.25
+  quartic: 0.08
+  initial_scale: 0.5
+  substeps: 48

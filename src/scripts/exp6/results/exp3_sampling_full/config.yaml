@@ -1,0 +1,29 @@
+experiment_id: EXP3
+result_name: exp3_sampling_full
+name: Sampling robustness
+description: Replacement vs no-replacement SGD covariance and late-slope comparison.
+seed: 45
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 6400
+  val_size: 1000
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 1000
+ensemble:
+  n_runs: 128
+  steps: 1000
+  lr: 0.05
+  methods:
+  - sgd_replacement
+  - sgd_no_replacement
+analysis:
+  n_directions: 32

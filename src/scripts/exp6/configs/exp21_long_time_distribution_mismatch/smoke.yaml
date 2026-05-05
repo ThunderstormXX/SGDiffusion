@@ -1,0 +1,19 @@
+experiment_id: EXP21
+result_name: exp21_long_time_distribution_mismatch_toy_smoke
+name: EXP21 long-time distribution mismatch smoke
+description: Smoke test for standard FP vs discrete FP covariance prediction.
+seed: 42
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  dim: 6
+  num_steps: 100
+  eta: 0.15
+  sigma_g: 0.5
+  eig_min: 0.3
+  eig_max: 3.0
+  n_runs: 10000
+  initial_scale: 1.0
+  eval_every: 2
+

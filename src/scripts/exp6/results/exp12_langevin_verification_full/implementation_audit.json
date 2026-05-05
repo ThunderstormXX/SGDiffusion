@@ -1,0 +1,12 @@
+{
+  "drift_norm": 0.013923035003244877,
+  "lr": 0.2,
+  "modified_noise_scaling_mode": "lr_times_reestimated_empirical_minibatch_noise_std",
+  "note": "EXP1B Langevin baselines use discrete-step lr noise scaling, not SDE sqrt(lr) step scaling.",
+  "sde_noise_to_drift_ratio": 4.237081684945721,
+  "sde_reference_scaling_mode": "sqrt(lr)_times_empirical_minibatch_noise_std",
+  "sde_style_noise_step_norm": 0.05899303661110706,
+  "standard_noise_scaling_mode": "lr_times_empirical_minibatch_noise_std",
+  "standard_noise_step_norm": 0.026382488012313843,
+  "standard_noise_to_drift_ratio": 1.8948805347515962
+}

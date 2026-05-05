@@ -1,0 +1,16 @@
+experiment_id: EXP20
+result_name: exp20_noise_anisotropy_toy_full
+name: EXP20 anisotropy toy full
+description: Full test for raw update anisotropy parallel to the mean gradient.
+seed: 42
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  mode: toy
+  dim: 10
+  n_runs: 50000
+  eta: 0.03
+  sigma_g: 0.5
+  point_scale: 2.0
+

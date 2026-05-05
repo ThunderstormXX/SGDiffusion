@@ -1,0 +1,30 @@
+experiment_id: EXP12
+result_name: exp12_langevin_verification_full
+name: Langevin implementation verification
+description: Diagnostic audit for standard and modified Langevin baselines at finite learning rate.
+seed: 62
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 1024
+  val_size: 512
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 50
+ensemble:
+  n_runs: 12
+  steps: 120
+  lr: 0.2
+analysis:
+  one_step_samples: 32
+  langevin_noise_batches: 6
+  horizons: [1, 5, 20, 120]
+  n_projection_directions: 8
+  calibration_multipliers: [0.5, 0.75, 1.0, 1.25, 1.5]

@@ -1,0 +1,38 @@
+experiment_id: EXP14
+result_name: exp14_eta_batch_scaling_full
+name: Eta and batch-size scaling
+description: MLP-386 learning-rate and batch-size scaling of projected variance in
+  flat and sharp Hessian buckets.
+seed: 56
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 1024
+  val_size: 512
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 200
+ensemble:
+  n_runs: 12
+  steps: 200
+  lr: 0.05
+  lr_grid:
+  - 0.0125
+  - 0.025
+  - 0.05
+  - 0.1
+  batch_grid:
+  - 32
+  - 64
+  - 128
+analysis:
+  n_flat_directions: 6
+  n_sharp_directions: 6
+  eval_every: 10

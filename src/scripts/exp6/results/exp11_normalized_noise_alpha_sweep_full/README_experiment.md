@@ -1,0 +1,89 @@
+# EXP11: Normalized SGD-noise alpha sweep
+
+Sweep alpha after normalizing minibatch noise to the full-gradient norm; alpha=1 means ||noise|| = ||g_full||.
+
+## Reproduce
+
+```bash
+bash /Users/igoreshka/Desktop/SGDiffusion/src/scripts/exp6/scripts/run_one.sh src/scripts/exp6/results/exp11_normalized_noise_alpha_sweep_full/config.yaml
+```
+
+## Artifacts
+
+- `config.yaml`: exact configuration used for this run.
+- `environment.json`: Python, package, hardware, git metadata.
+- `runtime.json`: runtime and RSS memory snapshot.
+- `metrics.json`: machine-readable primary metrics.
+- `raw_outputs.npz`: raw trajectories/statistics.
+- `figure_data.csv`: plotted data with mean/std/95% CI when applicable.
+- `make_figure.py`: figure generation from saved artifacts only.
+
+## Primary Metrics
+
+```json
+{
+  "alpha_0.1_diverged_count": 0,
+  "alpha_0.1_final_displacement_norm_mean": 9.57773733139038,
+  "alpha_0.1_final_displacement_norm_std": 0.07814295453750224,
+  "alpha_0.1_final_parameter_variance_trace": 0.6382278673737117,
+  "alpha_0.1_final_test_accuracy_mean": 0.85,
+  "alpha_0.1_final_test_loss_mean": 0.4979429468512535,
+  "alpha_0.1_final_test_loss_std": 0.006257089519790945,
+  "alpha_0.1_final_train_loss_mean": 0.12676937878131866,
+  "alpha_0.1_normalized_displacement": 0.7983610085103514,
+  "alpha_0.1_normalized_variance": 0.024377741467421072,
+  "alpha_0.5_diverged_count": 0,
+  "alpha_0.5_final_displacement_norm_mean": 9.9980788230896,
+  "alpha_0.5_final_displacement_norm_std": 0.2116992367979756,
+  "alpha_0.5_final_parameter_variance_trace": 4.546750977707271,
+  "alpha_0.5_final_test_accuracy_mean": 0.8485,
+  "alpha_0.5_final_test_loss_mean": 0.5290371626615524,
+  "alpha_0.5_final_test_loss_std": 0.013166865135621595,
+  "alpha_0.5_final_train_loss_mean": 0.11783718690276146,
+  "alpha_0.5_normalized_displacement": 0.8333989559524764,
+  "alpha_0.5_normalized_variance": 0.173667628001568,
+  "alpha_0_diverged_count": 0,
+  "alpha_0_final_displacement_norm_mean": 9.566156387329102,
+  "alpha_0_final_displacement_norm_std": 0.0,
+  "alpha_0_final_parameter_variance_trace": 0.0,
+  "alpha_0_final_test_accuracy_mean": 0.853,
+  "alpha_0_final_test_loss_mean": 0.4886813908815384,
+  "alpha_0_final_test_loss_std": 0.0,
+  "alpha_0_final_train_loss_mean": 0.14644381403923035,
+  "alpha_0_normalized_displacement": 0.7973956683824736,
+  "alpha_0_normalized_variance": 0.0,
+  "alpha_1_diverged_count": 0,
+  "alpha_1_final_displacement_norm_mean": 11.996749877929688,
+  "alpha_1_final_displacement_norm_std": 0.0187617539083215,
+  "alpha_1_final_parameter_variance_trace": 26.180762817041643,
+  "alpha_1_final_test_accuracy_mean": 0.6659999999999999,
+  "alpha_1_final_test_loss_mean": 1.0305624455213547,
+  "alpha_1_final_test_loss_std": 0.7158641587372624,
+  "alpha_1_final_train_loss_mean": 0.8375215977430344,
+  "alpha_1_normalized_displacement": 1.0,
+  "alpha_1_normalized_variance": 1.0,
+  "best_accuracy_delta_vs_alpha_1": 0.18700000000000006,
+  "best_test_accuracy": 0.853,
+  "best_test_accuracy_alpha": 0.0,
+  "best_test_alpha": 0.0,
+  "best_test_delta_vs_alpha_1": -0.5418810546398163,
+  "best_test_loss": 0.4886813908815384,
+  "best_train_alpha": 0.5,
+  "best_train_delta_vs_alpha_1": -0.7196844108402729,
+  "best_train_loss": 0.11783718690276146,
+  "lr": 0.08,
+  "n_alphas": 4,
+  "n_sweep_seeds": 2,
+  "normalized_noise": true,
+  "pass": true,
+  "reference_test_accuracy": 0.42,
+  "reference_test_loss": 1.6797226071357727,
+  "reference_train_accuracy": 0.4970703125,
+  "reference_train_loss": 1.502942681312561,
+  "steps": 2048,
+  "sweep_seeds": [
+    53,
+    153
+  ]
+}
+```

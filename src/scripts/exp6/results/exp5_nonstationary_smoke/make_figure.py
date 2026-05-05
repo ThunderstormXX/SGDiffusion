@@ -1,0 +1,247 @@
+#!/usr/bin/env python3
+"""Generate publication-style figures from saved exp6 artifacts only."""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import json
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import yaml
+
+
+def read_rows(path: Path) -> list[dict[str, str]]:
+    with open(path, newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def _fmt(value: object, digits: int = 4) -> str:
+    if isinstance(value, float):
+        return f"{value:.{digits}g}"
+    return str(value)
+
+
+def _load_optional_yaml(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    with open(path) as f:
+        return yaml.safe_load(f) or {}
+
+
+def _load_optional_json(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    with open(path) as f:
+        return json.load(f)
+
+
+def setup_text(result_dir: Path) -> str:
+    cfg = _load_optional_yaml(result_dir / "config.yaml")
+    metrics = _load_optional_json(result_dir / "metrics.json")
+    lines = [
+        "SETUP",
+        f"exp: {cfg.get('experiment_id', result_dir.name)}",
+        f"result: {cfg.get('result_name', result_dir.name)}",
+        f"seed: {cfg.get('seed', 'NA')}",
+        f"deterministic: {cfg.get('deterministic', 'NA')}",
+    ]
+    if cfg.get("device"):
+        lines.append(f"device: {cfg.get('device')}")
+
+    params = cfg.get("parameters", {})
+    if params:
+        lines += [
+            "",
+            "toy dynamics:",
+            f"n_runs: {params.get('n_runs', 'NA')}",
+            f"steps: {params.get('steps', 'NA')}",
+            f"eta/lr: {params.get('lr', 'NA')}",
+            f"lambda: {params.get('lambda', 'NA')}",
+            f"noise_std: {params.get('noise_std', 'NA')}",
+            f"x0: {params.get('x0', 'NA')}",
+            "dt convention: one SGD step",
+        ]
+
+    dataset = cfg.get("dataset", {})
+    training = cfg.get("training", {})
+    ensemble = cfg.get("ensemble", {})
+    analysis = cfg.get("analysis", {})
+    if dataset:
+        sample_size = int(dataset.get("sample_size", 0) or 0)
+        batch_size = int(training.get("batch_size", 0) or 0)
+        epoch_steps = sample_size // batch_size if sample_size and batch_size else None
+        steps = ensemble.get("steps")
+        epochs = float(steps) / epoch_steps if steps is not None and epoch_steps else None
+        lines += [
+            "",
+            "data/model:",
+            f"dataset: {dataset.get('name', 'NA')}",
+            f"sample/val: {dataset.get('sample_size', 'NA')}/{dataset.get('val_size', 'NA')}",
+            f"subset: {dataset.get('subset', 'NA')}",
+            f"normalize: {dataset.get('normalize', 'NA')}",
+            "model: MLP-386",
+            "",
+            "training:",
+            f"batch: {training.get('batch_size', 'NA')}",
+            f"replacement ref: {training.get('replacement', 'NA')}",
+            f"ref lr/steps: {training.get('lr', 'NA')}/{training.get('reference_steps', 'NA')}",
+            "",
+            "ensemble:",
+            f"n_runs: {ensemble.get('n_runs', 'NA')}",
+            f"steps: {steps}",
+            f"epochs: {_fmt(epochs) if epochs is not None else 'NA'}",
+            f"eta/lr: {ensemble.get('lr', 'NA')}",
+            f"methods: {','.join(ensemble.get('methods', []))[:38]}",
+        ]
+        if "langevin_noise_batches" in ensemble:
+            lines.append(f"noise batches: {ensemble['langevin_noise_batches']}")
+        if analysis:
+            lines.append(f"dirs: {analysis.get('n_directions', 'NA')}")
+
+    metric_keys = [
+        "pass",
+        "wasserstein_standard_to_sgd",
+        "wasserstein_modified_to_sgd",
+        "replacement_vs_no_replacement_wasserstein",
+        "relative_error",
+        "log_correlation",
+        "pearson_displacement_test_loss",
+        "spearman_displacement_test_loss",
+        "fit_improvement",
+    ]
+    present = [(k, metrics[k]) for k in metric_keys if k in metrics]
+    if present:
+        lines += ["", "key metrics:"]
+        for k, v in present[:7]:
+            short = k.replace("_to_sgd", "").replace("_displacement_test_loss", "")
+            lines.append(f"{short}: {_fmt(v)}")
+    return "\n".join(lines)
+
+
+def draw_setup_box(ax: plt.Axes, text: str) -> None:
+    ax.axis("off")
+    ax.text(
+        0.02,
+        0.98,
+        text,
+        ha="left",
+        va="top",
+        family="monospace",
+        fontsize=7.2,
+        linespacing=1.18,
+        bbox={"boxstyle": "square,pad=0.45", "facecolor": "#f7f7f7", "edgecolor": "#444444", "linewidth": 0.8},
+    )
+
+
+def make_time_variance(rows: list[dict[str, str]], out: Path, title: str, setup: str) -> None:
+    methods = sorted({r["method"] for r in rows if "method" in r})
+    keys = rows[0].keys()
+    has_mean_error = "mean_path_error_to_sgd" in keys
+    has_2d_path = {"mean_coord_1", "mean_coord_2"}.issubset(keys)
+    nplots = 1 + int(has_mean_error) + int(has_2d_path)
+    fig, axes = plt.subplots(1, nplots + 1, figsize=(3.7 + 5.0 * nplots, 5.2), gridspec_kw={"width_ratios": [1.1] + [1.55] * nplots})
+    draw_setup_box(axes[0], setup)
+    ax = axes[1]
+    for method in methods:
+        rr = [r for r in rows if r["method"] == method]
+        x = np.array([float(r["step"]) for r in rr])
+        y_key = "variance" if "variance" in rr[0] else "mean_direction_variance"
+        y = np.array([float(r[y_key]) for r in rr])
+        ax.plot(x, y, label=method)
+    ax.set_xlabel("step")
+    ax.set_ylabel("variance")
+    ax.set_title("ensemble variance")
+    ax.grid(alpha=0.25)
+    ax.legend(fontsize=8)
+
+    idx = 1
+    if has_mean_error:
+        ax = axes[idx + 1]
+        idx += 1
+        for method in methods:
+            rr = [r for r in rows if r["method"] == method]
+            x = np.array([float(r["step"]) for r in rr])
+            y = np.array([float(r["mean_path_error_to_sgd"]) for r in rr])
+            ax.plot(x, y, label=method)
+        ax.set_xlabel("step")
+        ax.set_ylabel("distance")
+        ax.set_title("mean path error to SGD")
+        ax.grid(alpha=0.25)
+        ax.legend(fontsize=8)
+
+    if has_2d_path:
+        ax = axes[idx + 1]
+        for method in methods:
+            rr = [r for r in rows if r["method"] == method]
+            x = np.array([float(r["mean_coord_1"]) for r in rr])
+            y = np.array([float(r["mean_coord_2"]) for r in rr])
+            ax.plot(x, y, marker="o", markersize=2, linewidth=1.2, label=method)
+            ax.plot(x[0], y[0], "k.", markersize=4)
+        ax.set_xlabel("mean projection 1")
+        ax.set_ylabel("mean projection 2")
+        ax.set_title("mean trajectory")
+        ax.grid(alpha=0.25)
+        ax.legend(fontsize=8)
+    fig.suptitle(title)
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    plt.savefig(out, dpi=180)
+    plt.close()
+
+
+def make_scatter(rows: list[dict[str, str]], out: Path, title: str, setup: str) -> None:
+    keys = rows[0].keys()
+    fig, axes = plt.subplots(1, 2, figsize=(8.8, 5.2), gridspec_kw={"width_ratios": [1.15, 1.7]})
+    draw_setup_box(axes[0], setup)
+    ax = axes[1]
+    if {"measured_variance", "predicted_variance"}.issubset(keys):
+        x = np.array([float(r["predicted_variance"]) for r in rows])
+        y = np.array([float(r["measured_variance"]) for r in rows])
+        ax.loglog(x + 1e-12, y + 1e-12, "o")
+        lo, hi = min(x.min(), y.min()) + 1e-12, max(x.max(), y.max()) + 1e-12
+        ax.loglog([lo, hi], [lo, hi], "k--", linewidth=1)
+        ax.set_xlabel("predicted variance")
+        ax.set_ylabel("measured variance")
+    elif {"flat_displacement", "final_test_loss"}.issubset(keys):
+        x = np.array([float(r["flat_displacement"]) for r in rows])
+        y = np.array([float(r["final_test_loss"]) for r in rows])
+        ax.plot(x, y, "o")
+        ax.set_xlabel("flat-direction displacement")
+        ax.set_ylabel("final test loss")
+    else:
+        ax.text(0.5, 0.5, "No plottable data", ha="center", va="center")
+    ax.set_title(title)
+    ax.grid(alpha=0.25)
+    plt.tight_layout()
+    plt.savefig(out, dpi=180)
+    plt.close()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("result_dir", type=str)
+    args = parser.parse_args()
+    result_dir = Path(args.result_dir)
+    rows = read_rows(result_dir / "figure_data.csv")
+    if not rows:
+        return
+    out = result_dir / "figure.png"
+    title = result_dir.name
+    setup = setup_text(result_dir)
+    if "method" in rows[0] and "step" in rows[0]:
+        make_time_variance(rows, out, title, setup)
+    else:
+        make_scatter(rows, out, title, setup)
+    if result_dir.parent.name == "results":
+        figures_dir = result_dir.parent.parent / "figures"
+        figures_dir.mkdir(parents=True, exist_ok=True)
+        top_level = figures_dir / f"{result_dir.name}.png"
+        top_level.write_bytes(out.read_bytes())
+        print(f"[saved] {top_level}")
+    print(f"[saved] {out}")
+
+
+if __name__ == "__main__":
+    main()

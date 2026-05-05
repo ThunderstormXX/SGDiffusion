@@ -4,11 +4,11 @@ Optimizer factories and wrappers.
 
 from .base import OptimizerFactory
 from .factories import (
-    SGDFactory,
     AdamFactory,
     AdamWFactory,
-    RMSpropFactory,
     NoisySGDFactory,
+    RMSpropFactory,
+    SGDFactory,
     build_optimizer_from_config,
 )
 from .wrappers import ScheduledOptimizer
@@ -28,7 +28,7 @@ __all__ = [
 def register_builtin_optimizers():
     """Register all built-in optimizer factories with the global registry."""
     from ..core.registry import registry
-    
+
     registry.register_optimizer("sgd", SGDFactory)
     registry.register_optimizer("adam", AdamFactory)
     registry.register_optimizer("adamw", AdamWFactory)

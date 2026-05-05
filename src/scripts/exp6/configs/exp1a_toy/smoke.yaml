@@ -1,0 +1,14 @@
+experiment_id: EXP1A
+result_name: exp1a_toy_smoke
+name: Toy falsification test
+description: Fast toy test where multiplicative discrete SGD noise is non-stationary while standard additive Langevin is stationary.
+seed: 42
+deterministic: true
+results_root: src/scripts/exp6/results
+parameters:
+  n_runs: 4096
+  steps: 800
+  lr: 0.02
+  lambda: 0.1
+  noise_std: 5.0
+  x0: 1.0

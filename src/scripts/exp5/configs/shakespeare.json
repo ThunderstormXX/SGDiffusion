@@ -1,47 +1,30 @@
 {
-    "description": "Shakespeare tunnel experiment configuration (SGD -> GD -> SGD)",
-    "dataset": "shakespeare",
-    "model": "NanoGPT",
-    "tracking_strategy": {
-        "stage1_sgd": ["weights"],
-        "stage2_gd": ["metrics"],
-        "stage3_sgd": ["weights", "hessians"]
-    },
-    "sizes": {
-        "small": {
-            "n_runs": 5,
-            "stage1_sgd_steps": 100,
-            "stage2_gd_epochs": 10,
-            "stage3_sgd_steps": 1000
-        },
-        "medium": {
-            "n_runs": 20,
-            "stage1_sgd_steps": 1000,
-            "stage2_gd_epochs": 100,
-            "stage3_sgd_steps": 1000
-        },
-        "large": {
-            "n_runs": 1000,
-            "stage1_sgd_steps": 1000,
-            "stage2_gd_epochs": 100,
-            "stage3_sgd_steps": 3000
-        }
-    },
+    "description": "Shakespeare character-level language model configuration for exp5",
+    "note": "All trackers log EVERY step (every: 1) for complete trajectory analysis",
     "hyperparameters": {
         "batch_size": 64,
         "replacement": true,
-        "sgd_lr": 0.01,
-        "gd_lr": 0.001,
-        "n_embd": 8,
-        "n_head": 1,
-        "n_layer": 1,
-        "mlp_ratio": 1,
-        "block_size": 16,
-        "note": "NanoGPT(n_embd=8, n_head=1, n_layer=1, mlp_ratio=1, block_size=16)"
+        "block_size": 128,
+        "n_embd": 64,
+        "n_head": 4,
+        "n_layer": 2,
+        "dropout": 0.1,
+        "note": "NanoGPT with ~100K parameters"
     },
-    "data_paths": {
-        "train": "src/data/shakespeare_train.pt",
-        "val": "src/data/shakespeare_val.pt",
-        "meta": "src/data/shakespeare_meta.pt"
+    "tracking": {
+        "note": "All trackers use every: 1 to log every step",
+        "stage1_sgd": {
+            "metrics": {"every": 1},
+            "weights": {"every": 1}
+        },
+        "stage2_gd": {
+            "metrics": {"every": 1},
+            "weights": {"every": 1}
+        },
+        "stage3_sgd": {
+            "metrics": {"every": 1},
+            "weights": {"every": 1},
+            "hessian": {"every": 1}
+        }
     }
 }

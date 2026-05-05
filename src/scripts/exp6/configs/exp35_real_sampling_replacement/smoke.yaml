@@ -1,0 +1,16 @@
+experiment_id: EXP35
+result_name: exp35_real_sampling_replacement_smoke
+name: EXP35 real sampling replacement smoke
+description: MLP386 with-replacement vs without-replacement ensemble covariance.
+seed: 42
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset: {name: mnist, sample_size: 512, val_size: 128, subset: first, normalize: false}
+training: {batch_size: 64, replacement: true, lr: 0.1, reference_steps: 10}
+parameters:
+  batch_size: 64
+  n_runs: 4
+  num_steps: 16
+  eta: 0.03
+

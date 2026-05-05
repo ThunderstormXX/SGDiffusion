@@ -1,0 +1,10 @@
+{
+  "diagonal_mass_fraction_final": 0.7300609906427431,
+  "dim": 386,
+  "final_offdiag_over_diag": 0.369748572813901,
+  "model": "MLP-386",
+  "n_directions": 8,
+  "n_runs": 16,
+  "num_steps": 8,
+  "pass": true
+}

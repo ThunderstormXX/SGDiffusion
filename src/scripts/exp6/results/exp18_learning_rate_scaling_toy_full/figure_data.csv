@@ -1,0 +1,17 @@
+step,method,variance,eta
+0.01,empirical_centered_covariance,0.00025039633262387707,0.01
+0.03,empirical_centered_covariance,0.002253566993614893,0.03
+0.1,empirical_centered_covariance,0.025039633262387707,0.1
+0.2,empirical_centered_covariance,0.10015853304955083,0.2
+0.01,eta2_Tr_Sigma,0.00025,0.01
+0.03,eta2_Tr_Sigma,0.00225,0.03
+0.1,eta2_Tr_Sigma,0.025000000000000005,0.1
+0.2,eta2_Tr_Sigma,0.10000000000000002,0.2
+0.01,empirical_raw_second_moment,0.0018491040497072226,0.01
+0.03,empirical_raw_second_moment,0.016641936447365,0.03
+0.1,empirical_raw_second_moment,0.18491040497072223,0.1
+0.2,empirical_raw_second_moment,0.7396416198828889,0.2
+0.01,eta2_Tr_Sigma_plus_ggT,0.0018479278163642747,0.01
+0.03,eta2_Tr_Sigma_plus_ggT,0.016631350347278473,0.03
+0.1,eta2_Tr_Sigma_plus_ggT,0.1847927816364275,0.1
+0.2,eta2_Tr_Sigma_plus_ggT,0.73917112654571,0.2

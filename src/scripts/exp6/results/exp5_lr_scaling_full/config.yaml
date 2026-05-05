@@ -1,0 +1,35 @@
+experiment_id: EXP5
+result_name: exp5_lr_scaling_full
+name: Learning-rate scaling of flat/sharp variance
+description: Real-model learning-rate scaling test for non-stationary diffusion in
+  flat directions and bounded variance in sharp directions.
+seed: 57
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 1024
+  val_size: 512
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 100
+ensemble:
+  n_runs: 24
+  steps: 400
+  lr: 0.05
+  lr_grid:
+  - 0.0125
+  - 0.025
+  - 0.05
+  - 0.1
+analysis:
+  mode: lr_scaling
+  eval_every: 40
+  n_flat_directions: 8
+  n_sharp_directions: 8

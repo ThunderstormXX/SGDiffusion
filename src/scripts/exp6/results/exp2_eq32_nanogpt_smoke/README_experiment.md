@@ -1,0 +1,61 @@
+# EXP2: NanoGPT Eq. 32 validation smoke
+
+Small smoke run for the Shakespeare/NanoGPT Eq. 32 validation variant.
+
+## Reproduce
+
+```bash
+bash /Users/igoreshka/Desktop/SGDiffusion/src/scripts/exp6/scripts/run_one.sh src/scripts/exp6/results/exp2_eq32_nanogpt_smoke/config.yaml
+```
+
+## Artifacts
+
+- `config.yaml`: exact configuration used for this run.
+- `environment.json`: Python, package, hardware, git metadata.
+- `runtime.json`: runtime and RSS memory snapshot.
+- `metrics.json`: machine-readable primary metrics.
+- `raw_outputs.npz`: raw trajectories/statistics.
+- `figure_data.csv`: plotted data with mean/std/95% CI when applicable.
+- `make_figure.py`: figure generation from saved artifacts only.
+
+## Primary Metrics
+
+```json
+{
+  "all_directions_log_correlation": -0.3960008669309172,
+  "all_directions_relative_error": 9569.94080817643,
+  "gamma_cv": 0.039201278144508626,
+  "gamma_estimate": 0.0007475169841200113,
+  "gamma_estimate_ci95_high": 0.0007668724190443754,
+  "gamma_estimate_ci95_low": 0.0006878377264365554,
+  "gamma_estimate_cv": 0.039201278144508626,
+  "gamma_estimate_mean": 0.0007273550727404654,
+  "gamma_estimate_std": 2.851324851631829e-05,
+  "gamma_max": 0.0007475169841200113,
+  "gamma_mean": 0.0007273550727404654,
+  "gamma_min": 0.0007071931613609195,
+  "gamma_seed_count": 2,
+  "gamma_std": 2.851324851631829e-05,
+  "heldout_log_correlation": -0.8345364461163995,
+  "heldout_relative_error_after_train_scalar": 0.9524477124214172,
+  "heldout_scalar_from_half_top_dirs": 0.12139534621976573,
+  "hessian_diag_fluctuation_mean_abs_correlation": NaN,
+  "hessian_diag_fluctuation_p95_abs_correlation": NaN,
+  "hessian_diag_fraction_mean": 0.8757702112197876,
+  "hessian_diag_fraction_p05": 0.8757702112197876,
+  "hessian_noise_batches": 1.0,
+  "hessian_offdiag_diag_ratio_mean": 0.3766324818134308,
+  "hessian_offdiag_diag_ratio_p95": 0.3766324818134308,
+  "hessian_offdiag_fraction_mean": 0.12422977387905121,
+  "hessian_offdiag_fraction_p95": 0.12422977387905121,
+  "log_correlation": -0.3213505297035765,
+  "log_mse": 3.980743032246501,
+  "pass": false,
+  "random_directions_log_correlation": -0.9194549612302372,
+  "random_directions_relative_error": 1304.7725760455019,
+  "relative_error": 2.7600345270643243,
+  "top_best_scalar": 0.13844902183585786,
+  "top_permutation_pvalue_log_correlation": 0.7810945273631841,
+  "top_relative_error_best_scalar": 0.908060724893173
+}
+```

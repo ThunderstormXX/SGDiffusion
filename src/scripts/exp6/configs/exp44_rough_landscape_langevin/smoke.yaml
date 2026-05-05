@@ -1,0 +1,21 @@
+experiment_id: EXP44
+result_name: exp44_rough_landscape_langevin_smoke
+name: EXP44 rough fluctuating landscape smoke
+description: Smoke reproduction of the rough fluctuating 1D landscape comparison between exact SGD and standard Langevin.
+seed: 49
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  n_modes: 20
+  landscape_length: 2.0
+  eta: 0.1
+  num_steps: 30
+  langevin_substeps: 50
+  n_samples: 3000
+  n_landscapes: 8
+  w_num: 300
+  w_start_std: 0.18
+  hist_min: -0.9
+  hist_max: 0.4
+  hist_bins: 80

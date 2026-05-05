@@ -1,0 +1,8 @@
+{
+  "modified_langevin_late_variance_slope": -3.4348383772790827e-28,
+  "pass": false,
+  "sgd_late_variance_slope": -1.437092683266531e-31,
+  "standard_langevin_late_variance_slope": -1.0138760887267962e-05,
+  "wasserstein_modified_to_sgd": 1.3076627828388103e-21,
+  "wasserstein_standard_to_sgd": 1.9706587424580482
+}

@@ -1,0 +1,9 @@
+{
+  "dim": 6,
+  "eta": 0.12,
+  "final_covariance_improvement_standard_over_corrected": 0.5755482459188893,
+  "final_mean_improvement_standard_over_corrected": 1.4394103928969055,
+  "n_runs": 30000,
+  "num_steps": 30,
+  "pass": true
+}

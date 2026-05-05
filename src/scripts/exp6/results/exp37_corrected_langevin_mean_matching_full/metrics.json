@@ -1,0 +1,9 @@
+{
+  "corrected_error_slope": 3.0874722836227773,
+  "dim": 6,
+  "final_improvement_standard_over_corrected": 3.8090714250569473,
+  "n_points": 2048,
+  "pass": true,
+  "standard_error_slope": 1.952949068002339,
+  "substeps": 160
+}

@@ -1,0 +1,102 @@
+# EXP9: Theory-denoised SGD smoke
+
+Smoke test removing only minibatch-noise components in theory-selected high-variance directions.
+
+## Reproduce
+
+```bash
+bash /Users/igoreshka/Desktop/SGDiffusion/src/scripts/exp6/scripts/run_one.sh src/scripts/exp6/results/exp9_theory_denoised_sgd_smoke/config.yaml
+```
+
+## Artifacts
+
+- `config.yaml`: exact configuration used for this run.
+- `environment.json`: Python, package, hardware, git metadata.
+- `runtime.json`: runtime and RSS memory snapshot.
+- `metrics.json`: machine-readable primary metrics.
+- `raw_outputs.npz`: raw trajectories/statistics.
+- `figure_data.csv`: plotted data with mean/std/95% CI when applicable.
+- `make_figure.py`: figure generation from saved artifacts only.
+
+## Primary Metrics
+
+```json
+{
+  "baseline_sgd_generalization_gap_ci95_high": 0.024595074482556767,
+  "baseline_sgd_generalization_gap_ci95_low": 0.023508416982693882,
+  "baseline_sgd_generalization_gap_mean": 0.024051745732625324,
+  "baseline_sgd_generalization_gap_std": 0.0006790194897532006,
+  "baseline_sgd_sharp_final_variance": 0.00018406570598017424,
+  "baseline_sgd_test_loss_ci95_high": 2.328511055013338,
+  "baseline_sgd_test_loss_ci95_low": 2.3269785486650476,
+  "baseline_sgd_test_loss_mean": 2.327744801839193,
+  "baseline_sgd_test_loss_std": 0.0009576169849203687,
+  "baseline_sgd_theory_high_variance_final_variance": 6.955013898135576e-09,
+  "baseline_sgd_total_displacement_mean": 0.12171298762162526,
+  "baseline_sgd_total_displacement_std": 0.005960208935277039,
+  "baseline_sgd_train_loss_ci95_high": 2.3041245054973576,
+  "baseline_sgd_train_loss_ci95_low": 2.303261606715777,
+  "baseline_sgd_train_loss_mean": 2.3036930561065674,
+  "baseline_sgd_train_loss_std": 0.0005391994169746805,
+  "denoise_random_generalization_gap_ci95_high": 0.024595508327876422,
+  "denoise_random_generalization_gap_ci95_low": 0.023509413648848836,
+  "denoise_random_generalization_gap_mean": 0.02405246098836263,
+  "denoise_random_generalization_gap_std": 0.0006786677999922097,
+  "denoise_random_sharp_final_variance": 0.00018407114839646965,
+  "denoise_random_test_loss_ci95_high": 2.328510194280856,
+  "denoise_random_test_loss_ci95_low": 2.3269775815217564,
+  "denoise_random_test_loss_delta": -9.139378867040193e-07,
+  "denoise_random_test_loss_mean": 2.327743887901306,
+  "denoise_random_test_loss_std": 0.0009576834778246799,
+  "denoise_random_theory_high_variance_final_variance": 6.9554619841483145e-09,
+  "denoise_random_total_displacement_mean": 0.12172556792696317,
+  "denoise_random_total_displacement_std": 0.005956861814070365,
+  "denoise_random_train_loss_ci95_high": 2.3041223769602994,
+  "denoise_random_train_loss_ci95_low": 2.3032604768655873,
+  "denoise_random_train_loss_mean": 2.3036914269129434,
+  "denoise_random_train_loss_std": 0.0005385753676788512,
+  "denoise_sharp_generalization_gap_ci95_high": 0.02461742128248326,
+  "denoise_sharp_generalization_gap_ci95_low": 0.023649148490872858,
+  "denoise_sharp_generalization_gap_mean": 0.02413328488667806,
+  "denoise_sharp_generalization_gap_std": 0.0006050444569555407,
+  "denoise_sharp_sharp_final_variance": 2.1851641329728722e-10,
+  "denoise_sharp_test_loss_ci95_high": 2.3281961578601766,
+  "denoise_sharp_test_loss_ci95_low": 2.327045172604504,
+  "denoise_sharp_test_loss_delta": -0.0001241366068525096,
+  "denoise_sharp_test_loss_mean": 2.3276206652323403,
+  "denoise_sharp_test_loss_std": 0.0007192159637408144,
+  "denoise_sharp_theory_high_variance_final_variance": 6.975163557854103e-09,
+  "denoise_sharp_total_displacement_mean": 0.12168294067184131,
+  "denoise_sharp_total_displacement_std": 0.0035239506956041954,
+  "denoise_sharp_train_loss_ci95_high": 2.303738716522253,
+  "denoise_sharp_train_loss_ci95_low": 2.303236044169072,
+  "denoise_sharp_train_loss_mean": 2.3034873803456626,
+  "denoise_sharp_train_loss_std": 0.0003141047890555506,
+  "denoise_theory_high_variance_generalization_gap_ci95_high": 0.024595102374418837,
+  "denoise_theory_high_variance_generalization_gap_ci95_low": 0.023508548036551218,
+  "denoise_theory_high_variance_generalization_gap_mean": 0.024051825205485027,
+  "denoise_theory_high_variance_generalization_gap_std": 0.0006789550269345173,
+  "denoise_theory_high_variance_sharp_final_variance": 0.00018406558956485242,
+  "denoise_theory_high_variance_test_loss_ci95_high": 2.3285109871272094,
+  "denoise_theory_high_variance_test_loss_ci95_low": 2.3269786165511763,
+  "denoise_theory_high_variance_test_loss_mean": 2.327744801839193,
+  "denoise_theory_high_variance_test_loss_std": 0.0009575321449327463,
+  "denoise_theory_high_variance_theory_high_variance_final_variance": 1.4134801956208645e-15,
+  "denoise_theory_high_variance_total_displacement_mean": 0.12171293298403423,
+  "denoise_theory_high_variance_total_displacement_std": 0.005960185343970847,
+  "denoise_theory_high_variance_train_loss_ci95_high": 2.3041244349098076,
+  "denoise_theory_high_variance_train_loss_ci95_low": 2.3032615183576075,
+  "denoise_theory_high_variance_train_loss_mean": 2.3036929766337075,
+  "denoise_theory_high_variance_train_loss_std": 0.0005392105212988788,
+  "denoise_theory_test_loss_delta": 0.0,
+  "denoise_theory_train_loss_delta": -7.947285984855057e-08,
+  "denoise_theory_variance_reduction_fraction": 0.999999796768171,
+  "pass": false,
+  "sharp_eigenvalue_max": 0.18869587779045105,
+  "sharp_eigenvalue_min": 0.15217848122119904,
+  "theory_high_variance_eigenvalue_abs_max": 3.7689958389819367e-06,
+  "theory_high_variance_eigenvalue_abs_min": 2.597641469037626e-06,
+  "theory_high_variance_predicted_max": 0.0016262959688901901,
+  "theory_high_variance_predicted_min": 0.0010718181729316711
+}
+```

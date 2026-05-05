@@ -1,0 +1,22 @@
+experiment_id: EXP44
+result_name: exp44_rough_landscape_langevin_full
+name: EXP44 rough fluctuating landscape full
+description: Rough fluctuating 1D landscape comparison between exact discrete SGD
+  and standard Langevin.
+seed: 49
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  n_modes: 20
+  landscape_length: 2.0
+  eta: 0.1
+  num_steps: 50
+  langevin_substeps: 100
+  n_samples: 10000
+  n_landscapes: 10
+  w_num: 300
+  w_start_std: 0.18
+  hist_min: -0.9
+  hist_max: 0.4
+  hist_bins: 100

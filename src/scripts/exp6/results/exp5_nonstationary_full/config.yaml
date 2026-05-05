@@ -1,0 +1,32 @@
+experiment_id: EXP5
+result_name: exp5_nonstationary_full
+name: Non-stationary regime validation
+description: Early/mid-training point test for non-zero-gradient theory improvement
+  over stationary approximation.
+seed: 47
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 1024
+  val_size: 512
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 50
+ensemble:
+  n_runs: 24
+  steps: 160
+  lr: 0.05
+  langevin_noise_batches: 4
+  methods:
+  - sgd_replacement
+  - standard_langevin
+  - modified_langevin
+analysis:
+  n_directions: 16

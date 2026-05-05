@@ -1,0 +1,23 @@
+experiment_id: EXP23
+result_name: exp23_batch_size_scaling_toy_smoke
+name: EXP23 batch-size scaling toy smoke
+description: Smoke test for batch-size scaling of centered covariance and raw moment.
+seed: 42
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  mode: toy
+  dim: 6
+  n_runs: 5000
+  eta: 0.03
+  batch_sizes:
+  - 1
+  - 2
+  - 4
+  - 8
+  - 16
+  - 64
+  - 256
+  sigma_g: 0.5
+  point_scale: 2.0

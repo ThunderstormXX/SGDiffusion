@@ -1,0 +1,9 @@
+{
+  "corrected_drift_mean_error": 0.007721336948268362,
+  "dim": 6,
+  "eta": 0.15,
+  "n_runs": 60000,
+  "pass": true,
+  "raw_covariance_nll_delta_vs_standard": 0.733879169008163,
+  "standard_mean_error": 0.04091814381627217
+}

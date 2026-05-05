@@ -1,0 +1,19 @@
+experiment_id: EXP16
+result_name: exp16_langevin_evidence_toy_smoke
+name: Langevin trajectory evidence toy smoke
+description: Smoke test for trajectory log-evidence of standard vs modified Gaussian Langevin surrogates on stochastic quadratic SGD.
+seed: 42
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  dim: 6
+  num_steps: 100
+  eta: 0.03
+  sigma_g: 0.5
+  sigma_h: 0.2
+  eig_min: 0.3
+  eig_max: 3.0
+  ridge: 1.0e-8
+  n_runs: 2
+

@@ -1,0 +1,44 @@
+experiment_id: EXP2
+result_name: exp2_eq32_nanogpt_full
+name: NanoGPT Eq. 32 validation
+description: Shakespeare/NanoGPT Eq. 32 validation using setup2 dataset, model, checkpoint,
+  replacement sampling, and analysis lr.
+seed: 42
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: shakespeare
+  train_path: src/data/shakespeare_train.pt
+  val_path: src/data/shakespeare_val.pt
+  sample_size: 4736
+  val_size: 1248
+  full_batch_size: 256
+model:
+  type: nanogpt
+  meta_path: src/data/shakespeare_meta.pt
+  n_embd: 8
+  n_head: 1
+  n_layer: 1
+  mlp_ratio: 1
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.01
+  reference_steps: 0
+  checkpoint_path: src/scripts/exp2/exp_results/setup2/initial_after_sgd_and_gd.pt
+ensemble:
+  n_runs: 48
+  steps: 500
+  lr: 0.001
+  methods:
+  - sgd_replacement
+analysis:
+  n_directions: 48
+  gradient_batches: 24
+  hessian_mean_batches: 1
+  hessian_noise_batches: 2
+  gamma_seeds:
+  - 42
+  - 142
+  - 242

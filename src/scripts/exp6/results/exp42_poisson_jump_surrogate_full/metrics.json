@@ -1,0 +1,12 @@
+{
+  "eta": 0.05,
+  "exploratory": true,
+  "multi_step_wasserstein_gaussian": 0.012413391837518608,
+  "multi_step_wasserstein_poisson": 0.005939282323739401,
+  "n_samples": 200000,
+  "one_step_wasserstein_gaussian": 0.013016740901394399,
+  "one_step_wasserstein_poisson": 0.0004889720370456009,
+  "pass": true,
+  "poisson_lambda": 0.6978344398493487,
+  "poisson_scale": 0.04025548121258792
+}

@@ -1,0 +1,36 @@
+experiment_id: EXP8
+result_name: exp8_diffusion_amplification_smoke
+name: Theory-guided diffusion amplification smoke
+description: Smoke test amplifying minibatch noise in theory-predicted high-variance
+  Hessian directions.
+seed: 50
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 256
+  val_size: 256
+  subset: first
+  normalize: false
+training:
+  batch_size: 32
+  replacement: true
+  lr: 0.05
+  reference_steps: 8
+ensemble:
+  n_runs: 6
+  steps: 40
+  lr: 0.03
+  amplification_factor: 2.0
+  methods:
+  - baseline_sgd
+  - amplify_theory_high_variance
+  - amplify_random
+  - amplify_sharp
+analysis:
+  n_theory_directions: 3
+  n_sharp_directions: 3
+  gradient_batches: 8
+  eval_every: 10

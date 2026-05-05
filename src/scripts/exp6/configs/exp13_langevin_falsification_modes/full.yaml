@@ -1,0 +1,32 @@
+experiment_id: EXP13
+result_name: exp13_langevin_falsification_modes_full
+name: Langevin falsification in Hessian modes
+description: MLP-386 development version of the main SGD vs Langevin falsification in Hessian eigenspaces.
+seed: 55
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 1024
+  val_size: 512
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 200
+ensemble:
+  n_runs: 24
+  steps: 300
+  lr: 0.05
+  langevin_noise_batches: 6
+  methods: [sgd, standard_langevin, modified_langevin, gd]
+analysis:
+  n_flat_directions: 6
+  n_sharp_directions: 6
+  n_diffusive_directions: 6
+  gradient_batches: 12
+  eval_every: 10

@@ -1,0 +1,10 @@
+step,method,variance
+0,offdiag_over_diag_hessian_basis,2.0882336067550096e-46
+1,offdiag_over_diag_hessian_basis,0.24838088321224952
+2,offdiag_over_diag_hessian_basis,0.36531807525055227
+3,offdiag_over_diag_hessian_basis,0.5770382095663695
+4,offdiag_over_diag_hessian_basis,0.45484475745506914
+5,offdiag_over_diag_hessian_basis,0.578158750495796
+6,offdiag_over_diag_hessian_basis,0.5389581630025759
+7,offdiag_over_diag_hessian_basis,0.496773008223506
+8,offdiag_over_diag_hessian_basis,0.369748572813901

@@ -1,0 +1,37 @@
+experiment_id: EXP11
+result_name: exp11_normalized_noise_alpha_sweep_smoke
+name: Normalized SGD-noise alpha sweep smoke
+description: Multi-seed smoke sweep where minibatch noise is normalized to the full-gradient norm.
+seed: 53
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 256
+  val_size: 256
+  subset: first
+  normalize: false
+training:
+  batch_size: 32
+  replacement: true
+  lr: 0.15
+  reference_steps: 64
+ensemble:
+  steps: 96
+  lr: 0.08
+analysis:
+  eval_every: 24
+model:
+  type: cnn
+  input_downsample: 14
+  conv_channels: [4, 8]
+  conv_use_bn: false
+  pool_after: [true, true]
+  gap_size: 1
+  mlp_hidden_dim: 16
+  mlp_num_layers: 1
+sweep:
+  alphas: [0.0, 0.1, 0.5, 1.0]
+  seeds: [53, 153]

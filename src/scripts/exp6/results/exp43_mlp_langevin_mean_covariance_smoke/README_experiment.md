@@ -1,0 +1,47 @@
+# EXP43: EXP43 MLP mean trajectory and covariance smoke
+
+Smoke diagnostic comparing exact SGD, standard Langevin, and drift-corrected Langevin on MLP/MNIST.
+
+## Reproduce
+
+```bash
+bash /Users/igoreshka/Desktop/SGDiffusion/src/scripts/exp6/scripts/run_one.sh src/scripts/exp6/results/exp43_mlp_langevin_mean_covariance_smoke/config.yaml
+```
+
+## Artifacts
+
+- `config.yaml`: exact configuration used for this run.
+- `environment.json`: Python, package, hardware, git metadata.
+- `runtime.json`: runtime and RSS memory snapshot.
+- `metrics.json`: machine-readable primary metrics.
+- `raw_outputs.npz`: raw trajectories/statistics.
+- `figure_data.csv`: plotted data with mean/std/95% CI when applicable.
+- `make_figure.py`: figure generation from saved artifacts only.
+
+## Primary Metrics
+
+```json
+{
+  "batch_size": 64,
+  "cov_error_corrected": 2.5738399795102196e-05,
+  "cov_error_standard": 2.760587092377317e-05,
+  "cov_improvement": 1.0725558365530687,
+  "dim": 386,
+  "eta": 0.05,
+  "final_mean_error_corrected": 0.007894347827797516,
+  "final_mean_error_standard": 0.010151190957132211,
+  "full_gradient_norm": 0.08545793360165073,
+  "hessian_gradient_norm": 0.010415542230510246,
+  "local_coefficients": "frozen_at_w0",
+  "mean_error_corrected": 0.00325451851335963,
+  "mean_error_standard": 0.003985516469465168,
+  "mean_improvement": 1.2246101698622482,
+  "model": "MLP-386",
+  "n_noise_batches": 16,
+  "n_runs": 12,
+  "num_steps": 10,
+  "pass": true,
+  "selected_eigenvalue_0": 0.1653558447614789,
+  "selected_eigenvalue_1": 0.1998679111111496
+}
+```

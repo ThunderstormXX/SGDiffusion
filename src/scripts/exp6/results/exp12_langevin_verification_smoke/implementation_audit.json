@@ -1,0 +1,15 @@
+{
+  "delta_t": 0.09,
+  "drift_norm": 0.010690140537917614,
+  "em_scaling_consistent_with_delta_t_equals_lr": true,
+  "lr": 0.09,
+  "modified_noise_scaling_mode": "Euler-Maruyama with dt=lr: lr * sqrt(D + grad_bar^2)",
+  "modified_noise_step_norm": 0.019243390560150144,
+  "modified_noise_to_drift_ratio": 1.8001064150554806,
+  "note": "For dtheta=-grad dt - sqrt(lr A)dW and dt=lr, Euler-Maruyama gives a noise step lr*sqrt(A)*xi.",
+  "sde_sigma_norm_before_dt": 0.05333635210990906,
+  "sde_sigma_scaling_mode": "continuous SDE coefficient sigma=sqrt(lr) * sqrt(D); EM step multiplies by sqrt(dt)=sqrt(lr)",
+  "standard_noise_scaling_mode": "Euler-Maruyama with dt=lr: lr * sqrt(D)",
+  "standard_noise_step_norm": 0.016000905632972715,
+  "standard_noise_to_drift_ratio": 1.496790952019571
+}

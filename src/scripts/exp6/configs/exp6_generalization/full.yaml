@@ -1,0 +1,29 @@
+experiment_id: EXP6
+result_name: exp6_generalization_full
+name: Diffusion vs generalization
+description: Correlate Hessian flat/sharp eigenspace displacement with final test performance and generalization gap.
+seed: 48
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 3200
+  val_size: 1000
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 500
+ensemble:
+  n_runs: 256
+  steps: 500
+  lr: 0.05
+  methods: [sgd_replacement]
+analysis:
+  n_directions: 32
+  n_flat_directions: 16
+  n_sharp_directions: 16

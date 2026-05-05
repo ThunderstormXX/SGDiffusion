@@ -1,0 +1,19 @@
+experiment_id: EXP39
+result_name: exp39_drift_correction_ablation_smoke
+name: EXP39 drift correction ablation smoke
+description: Smoke ablation separating corrected Hg drift from the wrong ggT covariance correction.
+seed: 44
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  dim: 4
+  eta: 0.12
+  n_runs: 8000
+  sigma: 0.35
+  eig_min: 0.4
+  eig_max: 1.6
+  cubic: 0.25
+  quartic: 0.08
+  point_scale: 0.8
+  substeps: 48

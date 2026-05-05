@@ -1,0 +1,14 @@
+experiment_id: EXP42
+result_name: exp42_poisson_jump_surrogate_smoke
+name: EXP42 Poisson jump surrogate smoke
+description: Smoke exploratory test of a compound Poisson surrogate for skewed increments.
+seed: 47
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  n_samples: 30000
+  eta: 0.05
+  gbar: 1.0
+  sigma: 0.8
+  multi_steps: 10

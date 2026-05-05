@@ -2,17 +2,18 @@
 Optimizer factories for common optimizers.
 """
 
+from collections.abc import Iterator
+
 import torch
 import torch.nn as nn
-from typing import Optional, Dict, Any, Iterator
 
-from .base import OptimizerFactory
 from ..core.config import OptimizerConfig
+from .base import OptimizerFactory
 
 
 class SGDFactory(OptimizerFactory):
     """Factory for SGD optimizer."""
-    
+
     def __init__(
         self,
         lr: float = 0.01,
@@ -27,7 +28,7 @@ class SGDFactory(OptimizerFactory):
         self.dampening = dampening
         self.weight_decay = weight_decay
         self.nesterov = nesterov
-    
+
     def build(self, params: Iterator[nn.Parameter]) -> torch.optim.Optimizer:
         return torch.optim.SGD(
             params,
@@ -41,7 +42,7 @@ class SGDFactory(OptimizerFactory):
 
 class AdamFactory(OptimizerFactory):
     """Factory for Adam optimizer."""
-    
+
     def __init__(
         self,
         lr: float = 0.001,
@@ -56,7 +57,7 @@ class AdamFactory(OptimizerFactory):
         self.eps = eps
         self.weight_decay = weight_decay
         self.amsgrad = amsgrad
-    
+
     def build(self, params: Iterator[nn.Parameter]) -> torch.optim.Optimizer:
         return torch.optim.Adam(
             params,
@@ -70,7 +71,7 @@ class AdamFactory(OptimizerFactory):
 
 class AdamWFactory(OptimizerFactory):
     """Factory for AdamW optimizer (Adam with decoupled weight decay)."""
-    
+
     def __init__(
         self,
         lr: float = 0.001,
@@ -85,7 +86,7 @@ class AdamWFactory(OptimizerFactory):
         self.eps = eps
         self.weight_decay = weight_decay
         self.amsgrad = amsgrad
-    
+
     def build(self, params: Iterator[nn.Parameter]) -> torch.optim.Optimizer:
         return torch.optim.AdamW(
             params,
@@ -99,7 +100,7 @@ class AdamWFactory(OptimizerFactory):
 
 class RMSpropFactory(OptimizerFactory):
     """Factory for RMSprop optimizer."""
-    
+
     def __init__(
         self,
         lr: float = 0.01,
@@ -116,7 +117,7 @@ class RMSpropFactory(OptimizerFactory):
         self.weight_decay = weight_decay
         self.momentum = momentum
         self.centered = centered
-    
+
     def build(self, params: Iterator[nn.Parameter]) -> torch.optim.Optimizer:
         return torch.optim.RMSprop(
             params,
@@ -132,10 +133,10 @@ class RMSpropFactory(OptimizerFactory):
 class NoisySGDFactory(OptimizerFactory):
     """
     Factory for NoisySGD optimizer.
-    
+
     Uses src.optimizer.NoisySGD by import.
     """
-    
+
     def __init__(
         self,
         lr: float = 0.01,
@@ -150,10 +151,10 @@ class NoisySGDFactory(OptimizerFactory):
         self.dampening = dampening
         self.weight_decay = weight_decay
         self.noise_std = noise_std
-    
+
     def build(self, params: Iterator[nn.Parameter]) -> torch.optim.Optimizer:
         from src.optimizer import NoisySGD
-        
+
         return NoisySGD(
             params,
             lr=self.lr,
@@ -170,16 +171,16 @@ def build_optimizer_from_config(
 ) -> torch.optim.Optimizer:
     """
     Build an optimizer from an OptimizerConfig.
-    
+
     Args:
         config: The optimizer configuration.
         params: Model parameters to optimize.
-    
+
     Returns:
         An optimizer instance.
     """
     from ..core.registry import registry
-    
+
     factory_cls = registry.get_optimizer(config.name)
     factory = factory_cls(**config.kwargs)
     return factory.build(params)

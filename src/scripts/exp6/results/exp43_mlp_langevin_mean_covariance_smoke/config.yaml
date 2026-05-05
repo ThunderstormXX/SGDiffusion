@@ -1,0 +1,27 @@
+experiment_id: EXP43
+result_name: exp43_mlp_langevin_mean_covariance_smoke
+name: EXP43 MLP mean trajectory and covariance smoke
+description: Smoke diagnostic comparing exact SGD, standard Langevin, and drift-corrected
+  Langevin on MLP/MNIST.
+seed: 48
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  sample_size: 256
+  val_size: 128
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 10
+parameters:
+  batch_size: 64
+  n_runs: 12
+  num_steps: 10
+  eta: 0.05
+  n_noise_batches: 16
+  covariance_ridge: 1.0e-10

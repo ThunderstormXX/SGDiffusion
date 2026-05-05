@@ -1,0 +1,35 @@
+experiment_id: EXP9
+result_name: exp9_theory_denoised_sgd_smoke
+name: Theory-denoised SGD smoke
+description: Smoke test removing only minibatch-noise components in theory-selected
+  high-variance directions.
+seed: 51
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 256
+  val_size: 256
+  subset: first
+  normalize: false
+training:
+  batch_size: 32
+  replacement: true
+  lr: 0.05
+  reference_steps: 8
+ensemble:
+  n_runs: 6
+  steps: 40
+  lr: 0.03
+  methods:
+  - baseline_sgd
+  - denoise_theory_high_variance
+  - denoise_random
+  - denoise_sharp
+analysis:
+  n_theory_directions: 3
+  n_sharp_directions: 3
+  gradient_batches: 8
+  eval_every: 10

@@ -1,0 +1,44 @@
+experiment_id: EXP2
+result_name: exp2_eq32_nanogpt_mlpstyle_full
+name: NanoGPT Eq. 32 validation MLP-style
+description: 'NanoGPT/Shakespeare EXP2 with the same protocol shape as the successful
+  MLP EXP2: train reference inside exp6, full-subset Hessian, then ensemble covariance
+  validation.'
+seed: 42
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: shakespeare
+  train_path: src/data/shakespeare_train.pt
+  val_path: src/data/shakespeare_val.pt
+  sample_size: 2048
+  val_size: 1000
+  full_batch_size: 2048
+model:
+  type: nanogpt
+  meta_path: src/data/shakespeare_meta.pt
+  n_embd: 8
+  n_head: 1
+  n_layer: 1
+  mlp_ratio: 1
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.01
+  reference_steps: 500
+ensemble:
+  n_runs: 128
+  steps: 500
+  lr: 0.001
+  methods:
+  - sgd_replacement
+analysis:
+  n_directions: 48
+  gradient_batches: 48
+  hessian_mean_batches: 1
+  hessian_noise_batches: 12
+  gamma_seeds:
+  - 42
+  - 142
+  - 242

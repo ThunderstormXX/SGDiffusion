@@ -1,0 +1,11 @@
+{
+  "drift_over_diffusion_prediction_final": 1078.2006666666193,
+  "eta": 0.02,
+  "final_drift_induced_prediction_flat": 7.770244799999792,
+  "final_flat_variance": 8.14442429694302,
+  "final_pure_diffusion_prediction_flat": 0.007200000000000123,
+  "flat_variance_power_law_tail": 3.0410521338091914,
+  "n_runs": 50000,
+  "num_steps": 900,
+  "pass": true
+}

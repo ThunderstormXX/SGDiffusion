@@ -1,0 +1,22 @@
+experiment_id: EXP40
+result_name: exp40_semigroup_log_matching_full
+name: EXP40 semigroup log matching full
+description: Tests whether corrected generator is closer to log(P_sgd)/eta than the
+  standard generator on a small state grid.
+seed: 45
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  etas:
+  - 0.015
+  - 0.03
+  - 0.06
+  - 0.1
+  n_grid: 61
+  x_max: 2.5
+  sigma: 0.35
+  a: 1.0
+  cubic: 0.2
+  quartic: 0.05
+  transition_ridge: 1.0e-05

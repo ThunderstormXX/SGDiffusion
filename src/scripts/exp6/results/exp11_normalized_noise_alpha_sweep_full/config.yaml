@@ -1,0 +1,48 @@
+experiment_id: EXP11
+result_name: exp11_normalized_noise_alpha_sweep_full
+name: Normalized SGD-noise alpha sweep
+description: Sweep alpha after normalizing minibatch noise to the full-gradient norm;
+  alpha=1 means ||noise|| = ||g_full||.
+seed: 53
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 1024
+  val_size: 1000
+  subset: first
+  normalize: false
+training:
+  batch_size: 32
+  replacement: true
+  lr: 0.15
+  reference_steps: 1024
+ensemble:
+  steps: 2048
+  lr: 0.08
+analysis:
+  eval_every: 256
+model:
+  type: cnn
+  input_downsample: 14
+  conv_channels:
+  - 8
+  - 16
+  conv_use_bn: false
+  pool_after:
+  - true
+  - true
+  gap_size: 1
+  mlp_hidden_dim: 32
+  mlp_num_layers: 1
+sweep:
+  alphas:
+  - 0.0
+  - 0.1
+  - 0.5
+  - 1.0
+  seeds:
+  - 53
+  - 153

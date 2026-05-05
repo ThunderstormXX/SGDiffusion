@@ -1,0 +1,20 @@
+experiment_id: EXP38
+result_name: exp38_corrected_generator_distribution_full
+name: EXP38 corrected generator distribution matching full
+description: Compares exact nonlinear discrete SGD ensemble moments with standard and corrected continuous generator surrogates.
+seed: 43
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  dim: 6
+  eta: 0.12
+  num_steps: 30
+  n_runs: 30000
+  sigma: 0.4
+  eig_min: 0.4
+  eig_max: 1.8
+  cubic: 0.25
+  quartic: 0.08
+  initial_scale: 0.5
+  substeps: 80

@@ -1,0 +1,35 @@
+experiment_id: EXP2
+result_name: exp2_eq32_full
+name: Parameter-free Eq. 32 validation
+description: Full MLP-386 Eq. 32 validation with gamma estimated from gradient statistics,
+  not variance fitting.
+seed: 44
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 2048
+  val_size: 1000
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 500
+ensemble:
+  n_runs: 128
+  steps: 500
+  lr: 0.05
+  methods:
+  - sgd_replacement
+analysis:
+  n_directions: 48
+  gradient_batches: 48
+  hessian_noise_batches: 12
+  gamma_seeds:
+  - 44
+  - 144
+  - 244

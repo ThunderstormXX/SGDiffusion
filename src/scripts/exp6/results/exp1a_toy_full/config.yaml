@@ -1,0 +1,15 @@
+experiment_id: EXP1A
+result_name: exp1a_toy_full
+name: Toy falsification test
+description: Full toy ensemble comparing discrete SGD, standard Langevin, and modified
+  Langevin.
+seed: 42
+deterministic: true
+results_root: src/scripts/exp6/results
+parameters:
+  n_runs: 4096
+  steps: 2000
+  lr: 0.05
+  lambda: 0.1
+  noise_std: 5.0
+  x0: 1.0

@@ -2,7 +2,7 @@
 Training tasks and trainer implementations.
 """
 
-from .tasks import Task, LanguageModelingTask, ClassificationTask
+from .tasks import ClassificationTask, LanguageModelingTask, Task
 from .trainer import Trainer
 
 __all__ = [

@@ -1,0 +1,37 @@
+experiment_id: EXP7
+result_name: exp7_diffusion_control_smoke
+name: Hessian-guided diffusion control smoke
+description: Smoke test for suppressing SGD updates along Hessian-flat directions
+  in MLP-386.
+seed: 49
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 256
+  val_size: 256
+  subset: first
+  normalize: false
+training:
+  batch_size: 32
+  replacement: true
+  lr: 0.05
+  reference_steps: 8
+ensemble:
+  n_runs: 8
+  steps: 80
+  lr: 0.03
+  methods:
+  - baseline_sgd
+  - suppress_flat
+  - suppress_theory_high_variance
+  - suppress_sharp
+analysis:
+  n_directions: 6
+  n_flat_directions: 3
+  n_sharp_directions: 3
+  n_theory_directions: 3
+  gradient_batches: 8
+  eval_every: 10

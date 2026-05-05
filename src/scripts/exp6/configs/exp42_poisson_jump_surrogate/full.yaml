@@ -1,0 +1,14 @@
+experiment_id: EXP42
+result_name: exp42_poisson_jump_surrogate_full
+name: EXP42 Poisson jump surrogate full
+description: Exploratory compound-Poisson surrogate matched to skewed SGD increment moments.
+seed: 47
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  n_samples: 200000
+  eta: 0.05
+  gbar: 1.0
+  sigma: 0.8
+  multi_steps: 20

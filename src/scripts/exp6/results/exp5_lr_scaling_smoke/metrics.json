@@ -1,0 +1,28 @@
+{
+  "flat_slope": 1.8576910605779754e-16,
+  "flat_slope_lr_correlation": 0.9925352765901759,
+  "flat_slope_vs_lr_fit_slope": 2.3677798917874267e-15,
+  "lr_0.01_flat_late_plateau_mean": 3.989596649972679e-17,
+  "lr_0.01_flat_late_slope": 3.0657142397549538e-18,
+  "lr_0.01_sharp_late_plateau_mean": 1.6171252354979515e-05,
+  "lr_0.01_sharp_late_slope": 5.547632099478503e-07,
+  "lr_0.03_flat_late_plateau_mean": 4.158358700290238e-16,
+  "lr_0.03_flat_late_slope": 2.6904813738173203e-17,
+  "lr_0.03_sharp_late_plateau_mean": 0.00012637484178412706,
+  "lr_0.03_sharp_late_slope": 3.859529169858432e-06,
+  "lr_0.09_flat_late_plateau_mean": 3.524355015726427e-15,
+  "lr_0.09_flat_late_slope": 1.8576910605779754e-16,
+  "lr_0.09_sharp_late_plateau_mean": 0.0007786068017594516,
+  "lr_0.09_sharp_late_slope": 1.621506817173212e-05,
+  "lr_grid": [
+    0.01,
+    0.03,
+    0.09
+  ],
+  "n_runs": 4,
+  "pass": true,
+  "primary_lr": 0.09,
+  "sharp_slope": 1.621506817173212e-05,
+  "slope_ratio": 1.1456572620622746e-11,
+  "steps": 50
+}

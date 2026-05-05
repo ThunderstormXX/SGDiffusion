@@ -1,0 +1,32 @@
+experiment_id: EXP7
+result_name: exp7_diffusion_control_full
+name: Hessian-guided diffusion control
+description: Interventional MLP-386 test suppressing SGD update components along Hessian-flat directions.
+seed: 49
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 3200
+  val_size: 1000
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 500
+ensemble:
+  n_runs: 48
+  steps: 500
+  lr: 0.05
+  methods: [baseline_sgd, suppress_flat, suppress_theory_high_variance, suppress_sharp]
+analysis:
+  n_directions: 16
+  n_flat_directions: 8
+  n_sharp_directions: 8
+  n_theory_directions: 8
+  gradient_batches: 50
+  eval_every: 125

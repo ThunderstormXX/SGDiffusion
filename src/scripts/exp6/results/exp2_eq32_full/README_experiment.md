@@ -1,0 +1,61 @@
+# EXP2: Parameter-free Eq. 32 validation
+
+Full MLP-386 Eq. 32 validation with gamma estimated from gradient statistics, not variance fitting.
+
+## Reproduce
+
+```bash
+bash /Users/igoreshka/Desktop/SGDiffusion/src/scripts/exp6/scripts/run_one.sh src/scripts/exp6/results/exp2_eq32_full/config.yaml
+```
+
+## Artifacts
+
+- `config.yaml`: exact configuration used for this run.
+- `environment.json`: Python, package, hardware, git metadata.
+- `runtime.json`: runtime and RSS memory snapshot.
+- `metrics.json`: machine-readable primary metrics.
+- `raw_outputs.npz`: raw trajectories/statistics.
+- `figure_data.csv`: plotted data with mean/std/95% CI when applicable.
+- `make_figure.py`: figure generation from saved artifacts only.
+
+## Primary Metrics
+
+```json
+{
+  "all_directions_log_correlation": 0.12898803096129707,
+  "all_directions_relative_error": 8.850183194473612,
+  "gamma_cv": 0.06399797350603227,
+  "gamma_estimate": 0.004380560480058193,
+  "gamma_estimate_ci95_high": 0.004266020538374946,
+  "gamma_estimate_ci95_low": 0.003689852070594663,
+  "gamma_estimate_cv": 0.06399797350603227,
+  "gamma_estimate_mean": 0.003977936304484804,
+  "gamma_estimate_std": 0.00025457986222310244,
+  "gamma_max": 0.00424983212724328,
+  "gamma_mean": 0.003977936304484804,
+  "gamma_min": 0.003745213383808732,
+  "gamma_seed_count": 3,
+  "gamma_std": 0.00025457986222310244,
+  "heldout_log_correlation": 0.9235601852621343,
+  "heldout_relative_error_after_train_scalar": 0.4317443072795868,
+  "heldout_scalar_from_half_top_dirs": 0.7514022623685338,
+  "hessian_diag_fluctuation_mean_abs_correlation": 0.28522273905627227,
+  "hessian_diag_fluctuation_p95_abs_correlation": 0.6654319232319629,
+  "hessian_diag_fraction_mean": 0.9378645420074463,
+  "hessian_diag_fraction_p05": 0.9158904552459717,
+  "hessian_noise_batches": 12.0,
+  "hessian_offdiag_diag_ratio_mean": 0.25568774342536926,
+  "hessian_offdiag_diag_ratio_p95": 0.3029043972492218,
+  "hessian_offdiag_fraction_mean": 0.06213543936610222,
+  "hessian_offdiag_fraction_p95": 0.08410951495170593,
+  "log_correlation": 0.9358897480692752,
+  "log_mse": 0.24007103380262493,
+  "pass": true,
+  "random_directions_log_correlation": 0.40004410668349133,
+  "random_directions_relative_error": 8.404288038121955,
+  "relative_error": 0.5695213369030817,
+  "top_best_scalar": 0.6932710160129277,
+  "top_permutation_pvalue_log_correlation": 0.004975124378109453,
+  "top_relative_error_best_scalar": 0.39988167586574097
+}
+```

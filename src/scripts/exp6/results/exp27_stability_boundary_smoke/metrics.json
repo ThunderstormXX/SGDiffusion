@@ -1,0 +1,9 @@
+{
+  "d": 0.2,
+  "empirical_unstable_fraction_in_mismatch_region": 0.6666666666666666,
+  "lambda": 1.0,
+  "mismatch_grid_points": 3,
+  "n_runs": 8000,
+  "num_steps": 300,
+  "pass": true
+}

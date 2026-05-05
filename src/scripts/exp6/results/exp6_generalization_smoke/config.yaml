@@ -1,0 +1,31 @@
+experiment_id: EXP6
+result_name: exp6_generalization_smoke
+name: Diffusion vs generalization smoke
+description: Small Hessian-eigenspace test correlating flat/sharp displacement with
+  validation loss and generalization gap.
+seed: 48
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  data_dir: ./data
+  sample_size: 256
+  val_size: 256
+  subset: first
+  normalize: false
+training:
+  batch_size: 32
+  replacement: true
+  lr: 0.05
+  reference_steps: 8
+ensemble:
+  n_runs: 8
+  steps: 80
+  lr: 0.03
+  methods:
+  - sgd_replacement
+analysis:
+  n_directions: 6
+  n_flat_directions: 3
+  n_sharp_directions: 3

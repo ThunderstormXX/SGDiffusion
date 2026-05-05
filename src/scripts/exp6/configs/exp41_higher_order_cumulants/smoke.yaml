@@ -1,0 +1,13 @@
+experiment_id: EXP41
+result_name: exp41_higher_order_cumulants_smoke
+name: EXP41 higher-order cumulant diagnostic smoke
+description: Smoke diagnostic showing Gaussian corrected Langevin misses non-Gaussian increment cumulants.
+seed: 46
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+parameters:
+  n_samples: 30000
+  eta: 0.05
+  gbar: 1.0
+  sigma: 0.8

@@ -1,0 +1,26 @@
+experiment_id: EXP33
+result_name: exp33_real_hessian_eigenbasis_smoke
+name: EXP33 real Hessian eigenbasis smoke
+description: MLP386 covariance decoupling in the Hessian eigenbasis.
+seed: 42
+deterministic: true
+device: cpu
+results_root: src/scripts/exp6/results
+dataset:
+  name: mnist
+  sample_size: 256
+  val_size: 128
+  subset: first
+  normalize: false
+training:
+  batch_size: 64
+  replacement: true
+  lr: 0.1
+  reference_steps: 10
+parameters:
+  batch_size: 64
+  n_runs: 16
+  num_steps: 8
+  eta: 0.03
+  n_directions: 8
+  ratio_threshold: 2.0
