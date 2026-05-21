@@ -1,0 +1,1 @@
+{"pair":[6,8],"reason":"closest_confirmed_pair_fallback","rows":[{"start":"pair_midpoint","final_nearest_cluster":6,"final_distance":0.3574082795069093,"final_loss":0.0756532561887533,"final_grad_norm":3.903596237099955e-05,"trace_points":2001}]}
