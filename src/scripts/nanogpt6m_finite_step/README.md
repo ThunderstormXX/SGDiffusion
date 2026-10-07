@@ -71,7 +71,7 @@ python make_figure.py --from-csv results/figure_points.csv results
 
 ## Results (`results/`)
 
-Reference point: training loss 3.07, validation loss 7.42 (the validation loss is lowest,
+Reference point: training loss 3.07, validation loss 7.69 (the validation loss is lowest,
 5.65, at step 55,000, so the reference point lies in the overfitted regime; the analysis
 concerns the training-loss landscape). The top-100 eigenvalues span 26.9 to 64.3, the
 relative residuals of the eigenvectors have median 0.6% (90th percentile 1.6%), and the
