@@ -1,0 +1,85 @@
+K=100 directions, exact lambda in [26.87, 64.28];  Gamma/lam^2 median 2.05e-03
+spectrum: round 1: residual median 0.0889 q90 0.1080 max 0.1131; round 2: residual median 0.0151 q90 0.0266 max 0.0324; round 3: residual median 0.0064 q90 0.0161 max 0.0217
+gamma_hat(top20 plateau, eta=0.00078) = 6.369e-05,  gamma_LS(top20) = 6.205e-05
+finishing | after SGD: full loss 3.2153  |grad| 1.613e+00  lambda_max ~ 46.2
+finishing | after low-noise SGD phase 1 (lr 0.02, B 256): full loss 3.0885  |grad| 2.011e-01  lambda_max ~ 59.3
+finishing | after low-noise SGD phase 2 (lr 0.02, B 1024): full loss 3.0756  |grad| 1.140e-01  lambda_max ~ 64.9
+finishing | after final GD (w*): full loss 3.0748  |grad| 1.913e-02  lambda_max ~ 65.0
+finishing | GD-only finishing, from the SGD end point: full loss 3.1328  |grad| 1.050e-01  lambda_max ~ 45.0
+
+eta=0.00078 (eta*lambda_max=0.05)  N=240 (dropped 0)  T=500  window=200  top-20 mean variance 2.484e-08 [2.444e-08, 2.502e-08]  creep(2nd/1st half) 1.000
+    discrete (measured d)    pred/emp all 0.998 top20 0.993 | median rel err 0.021 | in 90% CI 0.89
+    Langevin (measured d)    pred/emp all 0.982 top20 0.972 | median rel err 0.027 | in 90% CI 0.91
+    discrete (gamma)         pred/emp all 0.978 top20 1.025 | median rel err 0.048 | in 90% CI 0.57
+    Langevin (gamma)         pred/emp all 0.962 top20 1.003 | median rel err 0.052 | in 90% CI 0.55
+    with the noise measured at end points (d ratio 1.003, 4 points): discrete pred/emp all 1.001 top20 0.996 | Langevin all 0.985
+    random dirs: slope/(eta^2 d) median 0.650
+eta=0.0016 (eta*lambda_max=0.10)  N=240 (dropped 0)  T=500  window=200  top-20 mean variance 5.165e-08 [5.102e-08, 5.181e-08]  creep(2nd/1st half) 1.007
+    discrete (measured d)    pred/emp all 0.997 top20 1.003 | median rel err 0.017 | in 90% CI 0.89
+    Langevin (measured d)    pred/emp all 0.964 top20 0.959 | median rel err 0.038 | in 90% CI 0.63
+    discrete (gamma)         pred/emp all 0.976 top20 1.035 | median rel err 0.047 | in 90% CI 0.44
+    Langevin (gamma)         pred/emp all 0.944 top20 0.990 | median rel err 0.068 | in 90% CI 0.31
+    ratio test top20: empirical 1.014 [1.000, 1.029]  discrete 1.023  Langevin 1.000
+    dose-response slope of (R-1) vs lambda: empirical 4.57e-04 [3.15e-04, 6.51e-04]  discrete 4.26e-04  Langevin 9.57e-07  ->  observed effect = 1.07 [0.74, 1.53] of the discrete prediction
+    with the noise measured at end points (d ratio 1.000, 4 points): discrete pred/emp all 0.998 top20 1.003 | Langevin all 0.965
+    random dirs: slope/(eta^2 d) median 0.554
+eta=0.0039 (eta*lambda_max=0.25)  N=240 (dropped 0)  T=300  window=200  top-20 mean variance 1.369e-07 [1.357e-07, 1.370e-07]  creep(2nd/1st half) 1.002
+    discrete (measured d)    pred/emp all 0.985 top20 0.986 | median rel err 0.020 | in 90% CI 0.69
+    Langevin (measured d)    pred/emp all 0.906 top20 0.882 | median rel err 0.092 | in 90% CI 0.02
+    discrete (gamma)         pred/emp all 0.965 top20 1.017 | median rel err 0.043 | in 90% CI 0.32
+    Langevin (gamma)         pred/emp all 0.887 top20 0.910 | median rel err 0.112 | in 90% CI 0.01
+    ratio test top20: empirical 1.103 [1.091, 1.119]  discrete 1.095  Langevin 1.000
+    dose-response slope of (R-1) vs lambda: empirical 2.07e-03 [1.94e-03, 2.25e-03]  discrete 1.72e-03  Langevin 3.64e-06  ->  observed effect = 1.20 [1.13, 1.31] of the discrete prediction
+    with the noise measured at end points (d ratio 1.023, 4 points): discrete pred/emp all 1.008 top20 1.009 | Langevin all 0.927
+    random dirs: slope/(eta^2 d) median 0.508
+eta=0.0078 (eta*lambda_max=0.50)  N=240 (dropped 0)  T=300  window=200  top-20 mean variance 3.172e-07 [3.148e-07, 3.169e-07]  creep(2nd/1st half) 1.002
+    discrete (measured d)    pred/emp all 0.967 top20 0.967 | median rel err 0.034 | in 90% CI 0.27
+    Langevin (measured d)    pred/emp all 0.812 top20 0.762 | median rel err 0.186 | in 90% CI 0.00
+    discrete (gamma)         pred/emp all 0.947 top20 0.998 | median rel err 0.060 | in 90% CI 0.07
+    Langevin (gamma)         pred/emp all 0.794 top20 0.787 | median rel err 0.203 | in 90% CI 0.00
+    ratio test top20: empirical 1.277 [1.263, 1.294]  discrete 1.243  Langevin 1.001
+    dose-response slope of (R-1) vs lambda: empirical 5.19e-03 [5.05e-03, 5.39e-03]  discrete 4.28e-03  Langevin 8.20e-06  ->  observed effect = 1.21 [1.18, 1.26] of the discrete prediction
+    with the noise measured at end points (d ratio 1.036, 4 points): discrete pred/emp all 1.002 top20 1.002 | Langevin all 0.841
+    random dirs: slope/(eta^2 d) median 0.431
+eta=0.016 (eta*lambda_max=1.03)  N=240 (dropped 0)  T=300  window=200  top-20 mean variance 9.705e-07 [9.641e-07, 9.689e-07]  creep(2nd/1st half) 1.005
+    discrete (measured d)    pred/emp all 0.917 top20 0.907 | median rel err 0.080 | in 90% CI 0.00
+    Langevin (measured d)    pred/emp all 0.615 top20 0.513 | median rel err 0.382 | in 90% CI 0.00
+    discrete (gamma)         pred/emp all 0.897 top20 0.936 | median rel err 0.108 | in 90% CI 0.03
+    Langevin (gamma)         pred/emp all 0.600 top20 0.530 | median rel err 0.407 | in 90% CI 0.00
+    ratio test top20: empirical 1.905 [1.884, 1.929]  discrete 1.738  Langevin 1.001
+    dose-response slope of (R-1) vs lambda: empirical 1.54e-02 [1.52e-02, 1.57e-02]  discrete 1.21e-02  Langevin 1.78e-05  ->  observed effect = 1.27 [1.25, 1.29] of the discrete prediction
+    with the noise measured at end points (d ratio 1.100, 4 points): discrete pred/emp all 1.009 top20 0.999 | Langevin all 0.677
+    random dirs: slope/(eta^2 d) median 0.364
+eta=0.023 (eta*lambda_max=1.48)  N=240 (dropped 0)  T=300  window=200  top-20 mean variance 2.286e-06 [2.270e-06, 2.283e-06]  creep(2nd/1st half) 1.004
+    discrete (measured d)    pred/emp all 0.863 top20 0.846 | median rel err 0.133 | in 90% CI 0.00
+    Langevin (measured d)    pred/emp all 0.455 top20 0.317 | median rel err 0.540 | in 90% CI 0.00
+    discrete (gamma)         pred/emp all 0.844 top20 0.873 | median rel err 0.162 | in 90% CI 0.00
+    Langevin (gamma)         pred/emp all 0.443 top20 0.328 | median rel err 0.570 | in 90% CI 0.00
+    ratio test top20: empirical 3.121 [3.089, 3.161]  discrete 2.656  Langevin 1.002
+    dose-response slope of (R-1) vs lambda: empirical 3.23e-02 [3.20e-02, 3.27e-02]  discrete 2.45e-02  Langevin 2.60e-05  ->  observed effect = 1.32 [1.31, 1.34] of the discrete prediction
+    with the noise measured at end points (d ratio 1.164, 4 points): discrete pred/emp all 1.004 top20 0.985 | Langevin all 0.530
+    random dirs: slope/(eta^2 d) median 0.341
+drift eta=0.00078: |w_T-w*|=0.031  d ratio 0.999  lambda ratio 0.999  implied plateau change -0.000
+drift eta=0.00078: |w_T-w*|=0.031  d ratio 0.996  lambda ratio 0.992  implied plateau change +0.004
+drift eta=0.00078: |w_T-w*|=0.031  d ratio 1.012  lambda ratio 1.003  implied plateau change +0.009
+drift eta=0.00078: |w_T-w*|=0.031  d ratio 1.004  lambda ratio 1.009  implied plateau change -0.004
+drift eta=0.0016: |w_T-w*|=0.057  d ratio 0.997  lambda ratio 1.007  implied plateau change -0.009
+drift eta=0.0016: |w_T-w*|=0.059  d ratio 1.003  lambda ratio 1.009  implied plateau change -0.006
+drift eta=0.0016: |w_T-w*|=0.059  d ratio 1.007  lambda ratio 1.011  implied plateau change -0.003
+drift eta=0.0016: |w_T-w*|=0.058  d ratio 0.994  lambda ratio 1.016  implied plateau change -0.021
+drift eta=0.0039: |w_T-w*|=0.104  d ratio 1.016  lambda ratio 0.988  implied plateau change +0.027
+drift eta=0.0039: |w_T-w*|=0.104  d ratio 1.020  lambda ratio 1.002  implied plateau change +0.019
+drift eta=0.0039: |w_T-w*|=0.104  d ratio 1.027  lambda ratio 0.986  implied plateau change +0.040
+drift eta=0.0039: |w_T-w*|=0.103  d ratio 1.029  lambda ratio 1.008  implied plateau change +0.022
+drift eta=0.0078: |w_T-w*|=0.189  d ratio 1.040  lambda ratio 0.998  implied plateau change +0.042
+drift eta=0.0078: |w_T-w*|=0.188  d ratio 1.035  lambda ratio 1.017  implied plateau change +0.021
+drift eta=0.0078: |w_T-w*|=0.190  d ratio 1.036  lambda ratio 0.995  implied plateau change +0.040
+drift eta=0.0078: |w_T-w*|=0.192  d ratio 1.033  lambda ratio 0.993  implied plateau change +0.038
+drift eta=0.016: |w_T-w*|=0.359  d ratio 1.104  lambda ratio 1.012  implied plateau change +0.098
+drift eta=0.016: |w_T-w*|=0.356  d ratio 1.092  lambda ratio 1.004  implied plateau change +0.090
+drift eta=0.016: |w_T-w*|=0.355  d ratio 1.096  lambda ratio 1.001  implied plateau change +0.095
+drift eta=0.016: |w_T-w*|=0.361  d ratio 1.110  lambda ratio 1.015  implied plateau change +0.102
+drift eta=0.023: |w_T-w*|=0.500  d ratio 1.176  lambda ratio 1.001  implied plateau change +0.179
+drift eta=0.023: |w_T-w*|=0.496  d ratio 1.140  lambda ratio 1.001  implied plateau change +0.140
+drift eta=0.023: |w_T-w*|=0.499  d ratio 1.172  lambda ratio 1.022  implied plateau change +0.174
+drift eta=0.023: |w_T-w*|=0.493  d ratio 1.167  lambda ratio 1.013  implied plateau change +0.165
