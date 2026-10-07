@@ -37,6 +37,21 @@ make_figure.py
 
 Figures are generated only from saved intermediate artifacts.
 
+## Large-Scale Experiment: NanoGPT (6.6M Parameters) on WikiText-2
+
+The comparison of discrete SGD with the Langevin approximation on a
+6.6M-parameter NanoGPT is self-contained in
+`src/scripts/nanogpt6m_finite_step/`: the pipeline (`pipeline.py`), its launcher
+(`run_experiment.sh`), the figure script (`make_figure.py`) and the results of
+the reported run (`results/`).  See the `README.md` in that directory for the
+protocol and the commands.
+
+```bash
+cd src/scripts/nanogpt6m_finite_step
+pip install -r requirements.txt
+bash run_experiment.sh runs/nanogpt6m
+```
+
 ## Installation
 
 Python 3.10+ is recommended.
