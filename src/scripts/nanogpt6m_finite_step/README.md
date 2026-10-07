@@ -22,9 +22,12 @@ independently of the trajectories, so no constant is fitted.
 
 In the figure every point is one direction at one learning rate; the vertical axis is the
 measured variance divided by the Langevin prediction, the horizontal axis is
-`eta * lambda_i`. Langevin predicts 1 everywhere. Discrete SGD predicts the single curve
-`(2 lambda_i - eta Gamma_ii) / (2 lambda_i - eta (lambda_i^2 + Gamma_ii))`, which is
-`1 / (1 - eta lambda_i / 2)` up to the small ratio `Gamma_ii / lambda_i^2` (median 0.002).
+`eta * lambda_i`. Langevin predicts 1 everywhere. Discrete SGD predicts
+`(2 lambda_i - eta Gamma_ii) / (2 lambda_i - eta (lambda_i^2 + Gamma_ii))`. This prediction
+is evaluated for each of the 600 points with the `Gamma_ii` measured for its own direction,
+and the orange line connects these values in order of `eta * lambda_i`; nothing is averaged
+or approximated. (`Gamma_ii / lambda_i^2` lies between 0.001 and 0.007, so the line is
+within 1.3% of `1 / (1 - eta lambda_i / 2)`.)
 
 ## Protocol
 

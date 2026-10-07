@@ -8,9 +8,10 @@ where the measured variance is the variance of the SGD iterates along the direct
 N_TRAJ independent trajectories, averaged over the last WINDOW steps, and the Langevin
 prediction is eta d_i / (2 lambda_i - eta Gamma_ii) (with its time dependence over the same
 window). Langevin predicts y = 1. Discrete SGD predicts
-    y = (2 lambda_i - eta Gamma_ii) / (2 lambda_i - eta (lambda_i^2 + Gamma_ii)),
-which depends on the direction only through x and the small ratio Gamma_ii / lambda_i^2;
-the curve is drawn for the median of that ratio.
+    y = (2 lambda_i - eta Gamma_ii) / (2 lambda_i - eta (lambda_i^2 + Gamma_ii)).
+This prediction is evaluated for every plotted point with the Gamma_ii measured for its own
+direction; the orange line connects these values in order of x. Nothing is averaged or
+approximated in the prediction.
 
 Usage:
     python make_figure.py RUN_DIR OUT_DIR                 # from the trajectories of a pipeline run
@@ -40,11 +41,6 @@ ACCENT, INK, INK2, RULE, GRID = "#eb6834", "#0b0b0b", "#52514e", "#b9b8b2", "#e9
 C_GRID = np.array([0.05, 0.1, 0.25, 0.5, 1.0, 1.5])     # planned values of eta * lambda_max
 
 
-def theory(x, g):
-    """Discrete / Langevin plateau ratio as a function of x = eta*lambda and g = Gamma/lambda^2."""
-    return (1 - x * g / 2) / (1 - x * (1 + g) / 2)
-
-
 def points_from_run(run):
     """One row per (learning rate, direction), computed from the first N_TRAJ trajectories."""
     st = json.load(open(os.path.join(run, "stats.json")))
@@ -67,11 +63,16 @@ def points_from_run(run):
         W = min(WINDOW, T1 - 1)
         emp = p.var(axis=0, ddof=1)[-W:].mean(0)
         n = np.arange(T1 - W, T1)[:, None]
+        # Both predictions for each direction, with its own lambda_i, d_i and Gamma_ii, averaged
+        # over the same window as the data.
         kl = 2 * lam - eta * gam
         lang = (eta * d[:K] / kl * (1 - np.exp(-kl * eta * n))).mean(0)
+        a_i = 1 - 2 * eta * lam + eta ** 2 * (lam ** 2 + gam)
+        disc = (eta ** 2 * d[:K] * (1 - a_i ** n) / (1 - a_i)).mean(0)
         for i in range(K):
             rows.append(dict(eta=eta, eta_lambda_max=eta * lam.max(), lambda_i=lam[i],
-                             gamma_over_lambda_sq=gam[i] / lam[i] ** 2, x=eta * lam[i], y=emp[i] / lang[i]))
+                             gamma_over_lambda_sq=gam[i] / lam[i] ** 2, x=eta * lam[i],
+                             y=emp[i] / lang[i], discrete_prediction=disc[i] / lang[i]))
     return rows
 
 
@@ -85,15 +86,19 @@ def write_csv(rows, path):
         w = csv.writer(f)
         w.writerow(["eta", "eta_lambda_max", "lambda_i", "gamma_over_lambda_sq", "x", "y", "discrete_prediction"])
         for r in rows:
-            w.writerow([f"{r['eta']:.6g}", f"{r['eta_lambda_max']:.4g}", f"{r['lambda_i']:.4f}",
-                        f"{r['gamma_over_lambda_sq']:.5f}", f"{r['x']:.5f}", f"{r['y']:.5f}",
-                        f"{theory(r['x'], r['gamma_over_lambda_sq']):.5f}"])
+            w.writerow([f"{r['eta']:.6g}", f"{r['eta_lambda_max']:.6g}", f"{r['lambda_i']:.8g}",
+                        f"{r['gamma_over_lambda_sq']:.8g}", f"{r['x']:.8g}", f"{r['y']:.8g}",
+                        f"{r['discrete_prediction']:.8g}"])
 
 
 def draw(rows, path):
     etas = sorted({r["eta"] for r in rows})
-    g_med = float(np.median([r["gamma_over_lambda_sq"] for r in rows if r["eta"] == etas[0]]))
     n_dir = sum(r["eta"] == etas[0] for r in rows)
+    # Discrete prediction of every point (its own direction and learning rate), connected in order of x.
+    # The line starts at (0, 1): the two predictions coincide in the limit of a vanishing learning rate.
+    by_x = sorted(rows, key=lambda r: r["x"])
+    th_x = np.array([0.0] + [r["x"] for r in by_x])
+    th_y = np.array([1.0] + [r["discrete_prediction"] for r in by_x])
     # Six learning rates on a five-step ramp: the two smallest (no visible effect) share the lightest step.
     cls = {eta: max(0, k - (len(etas) - len(RAMP))) for k, eta in enumerate(etas)}
     names = {}
@@ -106,9 +111,8 @@ def draw(rows, path):
     plt.rcParams.update({"font.family": "STIXGeneral", "mathtext.fontset": "stix", "font.size": 8.5,
                          "axes.linewidth": 0.6, "pdf.fonttype": 42})
     fig, ax = plt.subplots(figsize=(3.35, 3.0))
-    xs = np.linspace(0, 1.56, 300)
     ax.axhline(1, color=INK2, lw=1.1, zorder=2)
-    ax.plot(xs, theory(xs, g_med), color=ACCENT, lw=1.9, solid_capstyle="round", zorder=2)
+    ax.plot(th_x, th_y, color=ACCENT, lw=1.9, solid_capstyle="round", solid_joinstyle="round", zorder=2)
     for eta in etas:
         sel = [r for r in rows if r["eta"] == eta]
         ax.scatter([r["x"] for r in sel], [r["y"] for r in sel], s=10, color=RAMP[cls[eta]],
@@ -137,7 +141,7 @@ def draw(rows, path):
     # The two predictions are labelled on the lines themselves (text in ink; position carries identity).
     ax.text(1.58, 2.0, "discrete SGD", color=INK, fontsize=9, ha="right", va="center", zorder=5,
             bbox=dict(facecolor="white", edgecolor="none", pad=1.5))      # masks the gridline behind the label
-    ax.annotate("", xy=(1.39, theory(1.39, g_med)), xytext=(1.39, 2.14),
+    ax.annotate("", xy=(1.39, float(np.interp(1.39, th_x, th_y))), xytext=(1.39, 2.14),
                 arrowprops=dict(arrowstyle="-", color=RULE, lw=0.6, shrinkA=0, shrinkB=3))
     ax.text(1.58, 0.955, "Langevin prediction", color=INK, fontsize=9, ha="right", va="top")
 
